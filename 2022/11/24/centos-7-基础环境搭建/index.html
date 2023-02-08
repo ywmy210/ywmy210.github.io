@@ -1,0 +1,833 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="CentOS 7 基础环境搭建在CentOS 7 初步服务配置之后，离一个正式部署应用的环境依然还有很多事情需要做。例如，nginx，jdk，redis，开发环境等，接下来，我们尝试在CentOS 7下编译安装nginx，redis，jdk。 开发环境包如果需要一个简单的编译环境，在完成更新之后，可安装这些包： 123sudo yum install make automake gcc gcc-c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos 7 基础环境搭建">
+<meta property="og:url" content="https://ywmy.xyz/2022/11/24/centos-7-%E5%9F%BA%E7%A1%80%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="CentOS 7 基础环境搭建在CentOS 7 初步服务配置之后，离一个正式部署应用的环境依然还有很多事情需要做。例如，nginx，jdk，redis，开发环境等，接下来，我们尝试在CentOS 7下编译安装nginx，redis，jdk。 开发环境包如果需要一个简单的编译环境，在完成更新之后，可安装这些包： 123sudo yum install make automake gcc gcc-c">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2022-11-24T12:42:00.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.649Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="jdk">
+<meta property="article:tag" content="nginx">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>centos 7 基础环境搭建 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="centos 7 基础环境搭建"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-11-24 20:42" pubdate>
+          2022年11月24日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          115 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">centos 7 基础环境搭建</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="CentOS-7-基础环境搭建"><a href="#CentOS-7-基础环境搭建" class="headerlink" title="CentOS 7 基础环境搭建"></a>CentOS 7 基础环境搭建</h1><p>在CentOS 7 初步服务配置之后，离一个正式部署应用的环境依然还有很多事情需要做。例如，nginx，jdk，redis，开发环境等，接下来，我们尝试在CentOS 7下编译安装nginx，redis，jdk。</p>
+<h2 id="开发环境包"><a href="#开发环境包" class="headerlink" title="开发环境包"></a>开发环境包</h2><p>如果需要一个简单的编译环境，在完成更新之后，可安装这些包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo yum install make automake gcc gcc-c++ kernel-devel<br><span class="hljs-comment"># debain 系</span><br>sudo apt install make automake gcc gcc-c++ kernel-devel<br></code></pre></td></tr></table></figure>
+
+<p>想要大而全，我们可以直接批量安装开发工具集：</p>
+<div class="note note-error">
+            <p>group install 安装过程中可能存在<br>Warning: Group development does not have any packages to install.<br>Maybe run: yum groups mark install (see man yum)<br>No packages in any requested group available to install or updateMaybe run: yum groups mark install (see man yum)<br>Error: No packages in any requested group available to install or update.<br>相关的报错，具体安装见下操作。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo yum clean all <br>sudo yum <span class="hljs-built_in">groups</span> list<br>sudo yum <span class="hljs-built_in">groups</span> install <span class="hljs-string">&quot;Development Tools&quot;</span><br><span class="hljs-comment"># 也许需要用上这几行命令</span><br>sudo yum <span class="hljs-built_in">groups</span> list hidden<br>sudo yum <span class="hljs-built_in">groups</span> info <span class="hljs-string">&#x27;Development Tools&#x27;</span><br>sudo yum <span class="hljs-built_in">groups</span> install <span class="hljs-string">&quot;Development Tools&quot;</span><br><span class="hljs-comment"># 或者是下面的</span><br>sudo yum groupinstall <span class="hljs-string">&quot;Development Tools&quot;</span> --<span class="hljs-built_in">setopt</span>=group_package_types=mandatory,default,optional<br><span class="hljs-comment"># 再或者</span><br>yum <span class="hljs-built_in">groups</span> mark install <span class="hljs-string">&quot;Development Tools&quot;</span><br>yum <span class="hljs-built_in">groups</span> mark convert <span class="hljs-string">&quot;Development Tools&quot;</span><br>yum groupinstall <span class="hljs-string">&quot;Development Tools&quot;</span><br><span class="hljs-comment"># 安装完了，再补上下面的</span><br>sudo yum install make automake gcc gcc-c++ kernel-devel<br></code></pre></td></tr></table></figure>
+
+<p>anyway，这个已经是70+程序包的大集合了。绝对的是超大包。</p>
+<p>再补充一个阿里云的EPEL源。操作见下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget -O /etc/yum.repos.d/epel.repo https://mirrors.aliyun.com/repo/epel-7.repo<br>yum makecache<br></code></pre></td></tr></table></figure>
+
+<p>对于debain系的。可以运行下面命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sudo apt install build-essential<br></code></pre></td></tr></table></figure>
+
+<h2 id="编译安装nginx"><a href="#编译安装nginx" class="headerlink" title="编译安装nginx"></a>编译安装nginx</h2><h3 id="默认安装"><a href="#默认安装" class="headerlink" title="默认安装"></a>默认安装</h3><p>这个实践我们可以查看nginx默认安装相关的模块，默认安装之前，同样需要安装nginx相关的依赖。</p>
+<p>1、linux内核版本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">uname</span> -a<br>Linux haproxy-node-b 3.10.0-1160.80.1.el7.x86_64 <span class="hljs-comment">#1 SMP Tue Nov 8 15:48:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux</span><br></code></pre></td></tr></table></figure>
+
+<p>2、GCC编译器<br>GCC（GNU Compiler Collection）可用来编译C语言程序。Nginx不会直接提供二进制可执行程序,只能下载源码进行编译。</p>
+<p>3、PCRE库<br>PCRE（Perl Compatible Regular Expressions，Perl兼容正则表达式）是由Philip Hazel开发的函数库，目前为很多软件所使用，该库支持正则表达式。</p>
+<p>4、zlib库<br>zlib库用于对HTTP包的内容做gzip格式的压缩，如果我们在nginx.conf里配置了gzip on，并指定对于某些类型（content-type）的HTTP响应使用gzip来进行压缩以减少网络传输量。</p>
+<p>5、OpenSSL开发库<br>如果我们的服务器不只是要支持HTTP，还需要在更安全的SSL协议上传输HTTP，那么就需要拥有OpenSSL了。另外，如果我们想使用MD5、SHA1等散列函数，那么也需要安装它。<br>上面几个库都是Nginx 基础功能所必需的，为简单起见我们可以通过yum 命令统一安装。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install make zlib zlib-devel gcc-c++ libtool openssl openssl-devel pcre pcre-devel -y<br></code></pre></td></tr></table></figure>
+
+<p>6、安装nginx</p>
+<p>nginx 下载官网<a target="_blank" rel="noopener" href="https://nginx.org/en/download.html">链接</a>，目前的稳定版版本已经到了1.22.1。使用命令下载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://nginx.org/download/nginx-1.22.1.tar.gz<br></code></pre></td></tr></table></figure>
+
+<p>下载完成后，解压源码程序包，默认安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf nginx-1.22.1.tar.gz -C /usr/local/src/<br><span class="hljs-built_in">cd</span> /usr/local/src/nginx-1.22.1/<br><span class="hljs-comment"># 编译参数默认安装</span><br>[root@haproxy-node-b nginx-1.22.1]<span class="hljs-comment"># ./configure </span><br>checking <span class="hljs-keyword">for</span> OS<br> + Linux 3.10.0-1160.80.1.el7.x86_64 x86_64<br>checking <span class="hljs-keyword">for</span> C compiler ... found<br> + using GNU C compiler<br> + gcc version: 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) <br>checking <span class="hljs-keyword">for</span> gcc -pipe switch ... found<br>checking <span class="hljs-keyword">for</span> -Wl,-E switch ... found<br>checking <span class="hljs-keyword">for</span> gcc <span class="hljs-built_in">builtin</span> atomic operations ... found<br>checking <span class="hljs-keyword">for</span> C99 variadic macros ... found<br>checking <span class="hljs-keyword">for</span> gcc variadic macros ... found<br>checking <span class="hljs-keyword">for</span> gcc <span class="hljs-built_in">builtin</span> 64 bit byteswap ... found<br>checking <span class="hljs-keyword">for</span> unistd.h ... found<br>checking <span class="hljs-keyword">for</span> inttypes.h ... found<br>checking <span class="hljs-keyword">for</span> limits.h ... found<br>checking <span class="hljs-keyword">for</span> sys/filio.h ... not found<br>.............省略........................<br>checking <span class="hljs-keyword">for</span> zlib library ... found<br>creating objs/Makefile<br><br>Configuration summary<br>  + using system PCRE library<br>  + OpenSSL library is not used<br>  + using system zlib library<br><br>  nginx path prefix: <span class="hljs-string">&quot;/usr/local/nginx&quot;</span><br>  nginx binary file: <span class="hljs-string">&quot;/usr/local/nginx/sbin/nginx&quot;</span><br>  nginx modules path: <span class="hljs-string">&quot;/usr/local/nginx/modules&quot;</span><br>  nginx configuration prefix: <span class="hljs-string">&quot;/usr/local/nginx/conf&quot;</span><br>  nginx configuration file: <span class="hljs-string">&quot;/usr/local/nginx/conf/nginx.conf&quot;</span><br>  nginx pid file: <span class="hljs-string">&quot;/usr/local/nginx/logs/nginx.pid&quot;</span><br>  nginx error <span class="hljs-built_in">log</span> file: <span class="hljs-string">&quot;/usr/local/nginx/logs/error.log&quot;</span><br>  nginx http access <span class="hljs-built_in">log</span> file: <span class="hljs-string">&quot;/usr/local/nginx/logs/access.log&quot;</span><br>  nginx http client request body temporary files: <span class="hljs-string">&quot;client_body_temp&quot;</span><br>  nginx http proxy temporary files: <span class="hljs-string">&quot;proxy_temp&quot;</span><br>  nginx http fastcgi temporary files: <span class="hljs-string">&quot;fastcgi_temp&quot;</span><br>  nginx http uwsgi temporary files: <span class="hljs-string">&quot;uwsgi_temp&quot;</span><br>  nginx http scgi temporary files: <span class="hljs-string">&quot;scgi_temp&quot;</span><br><br>make &amp;&amp; make install<br></code></pre></td></tr></table></figure>
+
+<p>默认安装可以查看编译模块信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b sbin]<span class="hljs-comment"># ./nginx -V</span><br>nginx version: nginx/1.20.2<br>built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) <br>configure arguments:<br></code></pre></td></tr></table></figure>
+
+<h3 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h3><p>如果有对nginx的其它模块需求，可以在编译过程中添加具体的编译参数。程序目录中使用<span class="label label-info">./configure --help</span>查看nginx的编译参数。</p>
+<div class="note note-warnning">
+            <p>重新编译后，执行mark，mark install覆盖安装。在重新编译安装前，建议对之前的配置文件进行备份。</p>
+          </div>
+
+<p>在重新编译参数后，编译过程如遇到依赖问题，直接yum安装对应的程序包即可。重新编译安装过的程序，安装后，再次查看编译的模块信息，如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b nginx]<span class="hljs-comment"># ./sbin/nginx -V</span><br>nginx version: nginx/1.20.2<br>built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) <br>built with OpenSSL 1.0.2k-fips  26 Jan 2017<br>TLS SNI support enabled<br>configure arguments: --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_geoip_module --with-http_flv_module --with-http_mp4_module --with-http_gzip_static_module<br></code></pre></td></tr></table></figure>
+
+<h3 id="编译引用指定模块"><a href="#编译引用指定模块" class="headerlink" title="编译引用指定模块"></a>编译引用指定模块</h3><p>通过查看nginx的编译参数，我们可以看到，可以手动指定模块的引用。以下实践编译安装OpenSSL,Pcre,Zlib。再指定nginx编译模块路径。</p>
+<h4 id="编译安装OpenSSL"><a href="#编译安装OpenSSL" class="headerlink" title="编译安装OpenSSL"></a>编译安装OpenSSL</h4><p>OpenSSL最新的稳定版本是支持到2026年9月7日的3.0系列。这也是一个长期支持(LTS)版本。之前的LTS版本（1.1.1 系列）也可用并支持到2023年9月11日。</p>
+<h5 id="下载OpenSSL"><a href="#下载OpenSSL" class="headerlink" title="下载OpenSSL"></a>下载OpenSSL</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b tools]<span class="hljs-comment"># wget https://www.openssl.org/source/openssl-3.0.7.tar.gz</span><br>--2022-11-25 16:29:45--  https://www.openssl.org/source/openssl-3.0.7.tar.gz<br>Resolving www.openssl.org (www.openssl.org)... 23.76.66.203, 2600:1417:e800:186::c1e, 2600:1417:e800:182::c1e<br>Connecting to www.openssl.org (www.openssl.org)|23.76.66.203|:443... connected.<br>HTTP request sent, awaiting response... 200 OK<br>Length: 15107575 (14M) [application/x-gzip]<br>Saving to: ‘openssl-3.0.7.tar.gz’<br><br>100%[======================================&gt;] 15,107,575  7.42MB/s   <span class="hljs-keyword">in</span> 1.9s   <br><br>2022-11-25 16:29:47 (7.42 MB/s) - ‘openssl-3.0.7.tar.gz’ saved [15107575/15107575]<br></code></pre></td></tr></table></figure>
+
+<p>即便是OpenSSL的3.0.0版本，也是存在漏洞的。在3.0.2版本解决了openssl出现拒绝服务漏洞【CVE-2022-0778】。</p>
+<p>CentOS 7 系统默认的OpenSSL版本为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">openssl version -a<br>OpenSSL 1.0.2k-fips  26 Jan 2017<br>built on: reproducible build, <span class="hljs-built_in">date</span> unspecified<br>platform: linux-x86_64<br>options:  bn(64,64) md2(int) rc4(8x,char) des(idx,cisc,16,int) idea(int) blowfish(idx) <br>compiler: gcc -I. -I.. -I../include  -fPIC -DOPENSSL_PIC -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DKRB5_MIT -m64 -DL_ENDIAN -Wall -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -Wa,--noexecstack -DPURIFY -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DRC4_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM<br>OPENSSLDIR: <span class="hljs-string">&quot;/etc/pki/tls&quot;</span><br>engines:  dynamic<br></code></pre></td></tr></table></figure>
+
+<h5 id="编译和安装OpenSSL"><a href="#编译和安装OpenSSL" class="headerlink" title="编译和安装OpenSSL"></a>编译和安装OpenSSL</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install perl-IPC-Cmd pcre pcre-devel -y<br><br><span class="hljs-built_in">cd</span> /usr/local/src/openssl-3.0.7/<br>./config --prefix=/usr/local/openssl3 --openssldir=/usr/local/openssl3 shared zlib<br>make<br>make install<br></code></pre></td></tr></table></figure>
+
+<h5 id="配置链接库"><a href="#配置链接库" class="headerlink" title="配置链接库"></a>配置链接库</h5><p>1、在目录<span class="label label-info">/etc/ld.so.conf.d</span>下创建一个名为openssl-3.conf的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /etc/ld.so.conf.d/<br>vim openssl-3.conf<br><span class="hljs-comment"># 文件内容</span><br>/usr/local/openssl3/lib64<br></code></pre></td></tr></table></figure>
+
+<p>2、创建软链接</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> -s /usr/local/openssl3/lib64/libssl.so.3 /usr/lib64/<br><span class="hljs-built_in">ln</span> -s /usr/local/openssl3/lib64/libcrypto.so.3 /usr/lib64/<br></code></pre></td></tr></table></figure>
+
+<p>如果已存在(file exist),则进行覆盖。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> -s /usr/local/openssl3/lib64/libssl.so.3 /usr/lib64/<br><span class="hljs-built_in">ln</span> -s /usr/local/openssl3/lib64/libcrypto.so.3 /usr/lib64/<br></code></pre></td></tr></table></figure>
+
+<h5 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h5><p>备份原有的openssl版本。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bsh">mv /usr/bin/openssl /usr/bin/openssl.backup<br></code></pre></td></tr></table></figure>
+
+<p>创建环境变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/profile.d/openssl.sh<br><span class="hljs-comment"># 变量内容</span><br><span class="hljs-comment">#Set OPENSSL_PATH</span><br>OPENSSL_PATH=<span class="hljs-string">&quot;/usr/local/openssl3/bin&quot;</span><br><span class="hljs-built_in">export</span> OPENSSL_PATH<br>PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$OPENSSL_PATH</span><br><span class="hljs-built_in">export</span> PATH<br><span class="hljs-comment"># 重新引用环境变量</span><br><span class="hljs-built_in">source</span> /etc/profile.d/openssl.sh<br></code></pre></td></tr></table></figure>
+
+<p>检查OpenSSL位置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b ~]<span class="hljs-comment"># which openssl</span><br>/usr/local/openssl3/bin/openssl<br></code></pre></td></tr></table></figure>
+
+<p>再次检查系统配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b ~]<span class="hljs-comment"># openssl version -a</span><br>OpenSSL 3.0.7 1 Nov 2022 (Library: OpenSSL 3.0.7 1 Nov 2022)<br>built on: Fri Nov 25 12:48:28 2022 UTC<br>platform: linux-x86_64<br>options:  bn(64,64)<br>compiler: gcc -fPIC -pthread -m64 -Wa,--noexecstack -Wall -O3 -DOPENSSL_USE_NODELETE -DL_ENDIAN -DOPENSSL_PIC -DOPENSSL_BUILDING_OPENSSL -DZLIB -DNDEBUG<br>OPENSSLDIR: <span class="hljs-string">&quot;/usr/local/openssl3&quot;</span><br>ENGINESDIR: <span class="hljs-string">&quot;/usr/local/openssl3/lib64/engines-3&quot;</span><br>MODULESDIR: <span class="hljs-string">&quot;/usr/local/openssl3/lib64/ossl-modules&quot;</span><br>Seeding <span class="hljs-built_in">source</span>: os-specific<br>CPUINFO: OPENSSL_ia32cap=0xfffa32035f8bffff:0x7a9<br></code></pre></td></tr></table></figure>
+
+<p>手动编译OpenSSL升级结束。</p>
+<h4 id="安装PCRE"><a href="#安装PCRE" class="headerlink" title="安装PCRE"></a>安装PCRE</h4><h5 id="下载PCRE"><a href="#下载PCRE" class="headerlink" title="下载PCRE"></a>下载PCRE</h5><p>PCRE源码托管在<a target="_blank" rel="noopener" href="https://sourceforge.net/">sourcefouge</a>上，直接搜索下载即可。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip<br>unzip pcre-8.45.zip <br><span class="hljs-built_in">mv</span> pcre-8.45 /usr/local/src/<br></code></pre></td></tr></table></figure>
+
+<h5 id="编译安装PCRE"><a href="#编译安装PCRE" class="headerlink" title="编译安装PCRE"></a>编译安装PCRE</h5><p>解压的源码在&#x2F;usr&#x2F;local&#x2F;src&#x2F;目录下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /usr/local/src/pcre-8.45/<br>./configure<br><br><span class="hljs-comment"># 默认的编译路径</span><br><span class="hljs-comment"># By default, `make install&#x27; will install all the files in `/usr/local/bin&#x27;, `/usr/local/lib&#x27; etc. </span><br><br>make <br>make install<br></code></pre></td></tr></table></figure>
+
+<h4 id="编译安装zlib"><a href="#编译安装zlib" class="headerlink" title="编译安装zlib"></a>编译安装zlib</h4><p>下载zlib，最新的版本，zlib-1.2.13</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://zlib.net/zlib-1.2.13.tar.gz<br>tar -zxvf zlib-1.2.13.tar.gz -C /usr/local/src/<br></code></pre></td></tr></table></figure>
+
+<p>编译安装zlib</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /usr/local/src/zlib-1.2.13/<br>./configure<br>make <br>make install<br></code></pre></td></tr></table></figure>
+
+<h4 id="指定模块路径安装nginx"><a href="#指定模块路径安装nginx" class="headerlink" title="指定模块路径安装nginx"></a>指定模块路径安装nginx</h4><p>以上，PCRE，OpenSSL,Zlib的模块源码均在&#x2F;usr&#x2F;local&#x2F;src目录下，我们在编译nginx的时候，指定对应的模块路径即可。操作如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b nginx-1.20.2]<span class="hljs-comment"># ./configure \</span><br>&gt; --with-http_ssl_module \<br>&gt; --with-http_v2_module \<br>&gt; --with-http_realip_module \<br>&gt; --with-http_geoip_module \<br>&gt; --with-http_flv_module \<br>&gt; --with-http_mp4_module \<br>&gt; --with-http_gzip_static_module \<br>&gt; --with-pcre=/usr/local/src/pcre-8.45 \<br>&gt; --with-zlib=/usr/local/src/zlib-1.2.13<br>&gt; --with-openssl=/usr/local/src/openssl-3.0.7<br><br><span class="hljs-comment"># 输出示例：</span><br><br>checking <span class="hljs-keyword">for</span> OS<br> + Linux 3.10.0-1160.80.1.el7.x86_64 x86_64<br>checking <span class="hljs-keyword">for</span> C compiler ... found<br> + using GNU C compiler<br> + gcc version: 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) <br>.............省略...............<br>Configuration summary<br>  + using PCRE library: /usr/local/src/pcre-8.45<br>  + using OpenSSL library: /usr/local/src/openssl-3.0.7<br>  + using zlib library: /usr/local/src/zlib-1.2.13<br><br>  nginx path prefix: <span class="hljs-string">&quot;/usr/local/nginx&quot;</span><br>  nginx binary file: <span class="hljs-string">&quot;/usr/local/nginx/sbin/nginx&quot;</span><br>  nginx modules path: <span class="hljs-string">&quot;/usr/local/nginx/modules&quot;</span><br>  nginx configuration prefix: <span class="hljs-string">&quot;/usr/local/nginx/conf&quot;</span><br>  nginx configuration file: <span class="hljs-string">&quot;/usr/local/nginx/conf/nginx.conf&quot;</span><br>  nginx pid file: <span class="hljs-string">&quot;/usr/local/nginx/logs/nginx.pid&quot;</span><br>  nginx error <span class="hljs-built_in">log</span> file: <span class="hljs-string">&quot;/usr/local/nginx/logs/error.log&quot;</span><br>  nginx http access <span class="hljs-built_in">log</span> file: <span class="hljs-string">&quot;/usr/local/nginx/logs/access.log&quot;</span><br>  nginx http client request body temporary files: <span class="hljs-string">&quot;client_body_temp&quot;</span><br>  nginx http proxy temporary files: <span class="hljs-string">&quot;proxy_temp&quot;</span><br>  nginx http fastcgi temporary files: <span class="hljs-string">&quot;fastcgi_temp&quot;</span><br>  nginx http uwsgi temporary files: <span class="hljs-string">&quot;uwsgi_temp&quot;</span><br>  nginx http scgi temporary files: <span class="hljs-string">&quot;scgi_temp&quot;</span><br><br><span class="hljs-comment"># 编译安装</span><br>make <br>make install<br></code></pre></td></tr></table></figure>
+
+<p>再次查看对比之前默认安装，编译安装，和手动指定模块安装输出的编译结果：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b nginx]<span class="hljs-comment"># ./sbin/nginx -V</span><br>nginx version: nginx/1.20.2<br>built by gcc 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) <br>built with OpenSSL 3.0.7 1 Nov 2022<br>TLS SNI support enabled<br>configure arguments: --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_geoip_module --with-http_flv_module --with-http_mp4_module --with-http_gzip_static_module --with-pcre=/usr/local/src/pcre-8.45 --with-zlib=/usr/local/src/zlib-1.2.13 --with-openssl=/usr/local/src/openssl-3.0.7<br></code></pre></td></tr></table></figure>
+
+<p>至此编译安装nginx结束了。</p>
+<h3 id="nginx-自启动配置"><a href="#nginx-自启动配置" class="headerlink" title="nginx 自启动配置"></a>nginx 自启动配置</h3><p>在<span class="label label-info">/usr/local/sbin</span>下创建软链接指向nginx的安装目录。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> -s /usr/local/nginx/sbin/nginx /usr/local/sbin/<br></code></pre></td></tr></table></figure>
+
+<h4 id="nginx常用的控制命令"><a href="#nginx常用的控制命令" class="headerlink" title="nginx常用的控制命令"></a>nginx常用的控制命令</h4><p>运行nginx程序相关的控制命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 测试配置文件</span><br>[root@haproxy-node-b ~]<span class="hljs-comment"># nginx -t</span><br>nginx: the configuration file /usr/local/nginx/conf/nginx.conf syntax is ok<br>nginx: configuration file /usr/local/nginx/conf/nginx.conf <span class="hljs-built_in">test</span> is successful<br><span class="hljs-comment"># 默认启动nginx服务</span><br>[root@haproxy-node-b ~]<span class="hljs-comment"># nginx </span><br>[root@haproxy-node-b ~]<span class="hljs-comment"># ps aux | grep nginx</span><br>root     15930  0.0  0.0  22956   900 ?        Ss   23:37   0:00 nginx: master process nginx<br>nobody   15931  0.0  0.0  23412  1608 ?        S    23:37   0:00 nginx: worker process<br>root     15933  0.0  0.0 112812   980 pts/0    S+   23:37   0:00 grep --color=auto nginx<br><span class="hljs-comment"># 停止nginx服务</span><br>[root@haproxy-node-b ~]<span class="hljs-comment"># nginx -s stop</span><br>[root@haproxy-node-b ~]<span class="hljs-comment"># ps aux | grep nginx</span><br>root     15937  0.0  0.0 112812   976 pts/0    S+   23:38   0:00 grep --color=auto nginx<br><span class="hljs-comment"># 优雅停止</span><br>[root@haproxy-node-b ~]<span class="hljs-comment"># nginx -s quit</span><br><span class="hljs-comment"># 指定配置文件启动</span><br>[root@haproxy-node-b ~]<span class="hljs-comment"># nginx -c /usr/local/nginx/conf/nginx.conf</span><br><span class="hljs-comment"># 热装配配置文件</span><br>root@haproxy-node-b ~]<span class="hljs-comment"># nginx -s reload</span><br><span class="hljs-comment"># 重新打开nginx日志文件</span><br>nginx -s reopen<br></code></pre></td></tr></table></figure>
+
+<p>nginx启动时，会生成两种类型的进程，一个是主进程（Master），一个（windows版本的目前只有一个）和多个工作进程（Worker）。主进程并不处理网络请求，主要负责调度工作进程，也就是图示的三项：加载配置、启动工作进程及非停升级。所以，nginx启动以后，查看操作系统的进程列表，我们就能看到至少有两个nginx进程。</p>
+<h4 id="systemctl-nginx-自启动配置"><a href="#systemctl-nginx-自启动配置" class="headerlink" title="systemctl nginx 自启动配置"></a>systemctl nginx 自启动配置</h4><p>配置启动服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /usr/lib/systemd/system/nginx.service<br>配置项：<br>[Unit]<br>Description=nginx - high performance web server<br>Documentation=https://nginx.org/en/docs/<br>After=network-online.target remote-fs.target<br>Wants=network-online.target<br>[Service]<br>Type=forking<br>PIDFile=/usr/local/nginx/logs/nginx.pid<br>ExecStart=/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf<br>ExecReload=/bin/kill -s HUP <span class="hljs-variable">$MAINPID</span><br>ExecStop=/bin/kill -s TERM <span class="hljs-variable">$MAINPID</span><br>[Install]<br>WantedBy=multi-user.target<br><span class="hljs-comment"># 更新systemd服务</span><br>systemctl daemon-reload<br></code></pre></td></tr></table></figure>
+
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 启动nginx</span><br>[root@haproxy-node-b system]<span class="hljs-comment"># systemctl start nginx</span><br><span class="hljs-comment"># 查看nginx服务状态</span><br>[root@haproxy-node-b system]<span class="hljs-comment"># systemctl status nginx</span><br>● nginx.service - nginx - high performance web server<br>   Loaded: loaded (/etc/systemd/system/nginx.service; disabled; vendor preset: disabled)<br>   Active: active (running) since Fri 2022-11-25 23:59:16 CST; 1min 54s ago<br>     Docs: https://nginx.org/en/docs/<br>  Process: 16168 ExecStart=/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf (code=exited, status=0/SUCCESS)<br> Main PID: 16169 (nginx)<br>   CGroup: /system.slice/nginx.service<br>           ├─16169 nginx: master process /usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf<br>           └─16170 nginx: worker process<br><br>Nov 25 23:59:16 haproxy-node-b systemd[1]: Starting nginx - high performance web server...<br>Nov 25 23:59:16 haproxy-node-b systemd[1]: Started nginx - high performance web server.<br><span class="hljs-comment"># 停止nginx服务</span><br>systemctl stop nginx<br><span class="hljs-comment"># 重新装载nginx服务</span><br>systemctl restart nginx<br><span class="hljs-comment"># 自启动nginx服务</span><br>[root@haproxy-node-b system]<span class="hljs-comment"># systemctl enable nginx</span><br>Created symlink from /etc/systemd/system/multi-user.target.wants/nginx.service to /etc/systemd/system/nginx.service.<br><br><span class="hljs-comment"># 取消自启动服务</span><br>systemctl <span class="hljs-built_in">disable</span> nginx<br></code></pre></td></tr></table></figure>
+
+<h2 id="安装JDK"><a href="#安装JDK" class="headerlink" title="安装JDK"></a>安装JDK</h2><p>官网下载JDK环境，官网下载<a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/downloads/">链接</a>,我们部署的选择JAVA 8的最新版本。下载JDK需要登录ORACLE的账号。</p>
+<p>1、解压缩jdk</p>
+<p>我们可以在<span class="label label-info">/usr/local</span>下创建jdk的环境目录。把jdk解压到环境目录中。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> /usr/local/java<br>tar -zxvf jdk-8u351-linux-x64.tar.gz -C /usr/local/java<br></code></pre></td></tr></table></figure>
+
+<p>2、配置环境变量</p>
+<p>在<span class="label label-info">/etc/profile.d</span>，创建jdk.sh文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /etc/profile.d/<br>vim java.sh<br><span class="hljs-comment"># 配置内容</span><br><span class="hljs-comment"># set java environment</span><br><span class="hljs-built_in">export</span> JAVA_HOME=/usr/local/java/jdk1.8.0_351<br><span class="hljs-built_in">export</span> JRE_HOME=<span class="hljs-variable">$&#123;JAVA_HOME&#125;</span>/jre<br><span class="hljs-built_in">export</span> CLASSPATH=.:<span class="hljs-variable">$&#123;java_home&#125;</span>/lib:<span class="hljs-variable">$&#123;JRE_HOME&#125;</span>/lib<br><span class="hljs-built_in">export</span> JAVA_PATH=<span class="hljs-variable">$&#123;JAVA_HOME&#125;</span>/bin:<span class="hljs-variable">$&#123;JRE_HOME&#125;</span>/bin<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$&#123;JAVA_HOME&#125;</span>/bin:<span class="hljs-variable">$PATH</span><br></code></pre></td></tr></table></figure>
+
+<p>3、重新引用环境变量</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b profile.d]<span class="hljs-comment"># source /etc/profile</span><br>[root@haproxy-node-b profile.d]<span class="hljs-comment"># java -version</span><br>java version <span class="hljs-string">&quot;1.8.0_351&quot;</span><br>Java(TM) SE Runtime Environment (build 1.8.0_351-b10)<br>Java HotSpot(TM) 64-Bit Server VM (build 25.351-b10, mixed mode)<br></code></pre></td></tr></table></figure>
+
+<p>JDK环境搭建完毕。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/security/">#security</a>
+      
+        <a href="/tags/jdk/">#jdk</a>
+      
+        <a href="/tags/nginx/">#nginx</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>centos 7 基础环境搭建</div>
+      <div>https://ywmy.xyz/2022/11/24/centos-7-基础环境搭建/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年11月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/21/centos-%E6%90%AD%E5%BB%BAzimbra%E4%BC%81%E4%B8%9A%E9%82%AE%E7%AE%B1/" title="centos 搭建zimbra企业邮箱">
+                        <span class="hidden-mobile">centos 搭建zimbra企业邮箱</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

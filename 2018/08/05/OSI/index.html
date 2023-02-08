@@ -1,0 +1,795 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="OSI七层模型OSI七层模型相关的名词解释，纯文字，纯理论，仅记录备忘。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OSI">
+<meta property="og:url" content="https://ywmy.xyz/2018/08/05/OSI/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="OSI七层模型OSI七层模型相关的名词解释，纯文字，纯理论，仅记录备忘。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/network.jpg">
+<meta property="article:published_time" content="2018-08-05T15:15:04.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.753Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="OSI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/network.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>OSI - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="OSI"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2018-08-05 23:15" pubdate>
+          2018年8月5日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          55 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">OSI</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="OSI七层模型"><a href="#OSI七层模型" class="headerlink" title="OSI七层模型"></a>OSI七层模型</h1><p>OSI七层模型相关的名词解释，纯文字，纯理论，仅记录备忘。</p>
+<span id="more"></span>
+
+<h2 id="各功能简介"><a href="#各功能简介" class="headerlink" title="各功能简介"></a>各功能简介</h2><h3 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h3><p>物理层位于OSI参考模型的最低层，它直接面向原始比特流的传输；</p>
+<p>　为了实现原始比特流的物理传输，物理层必须解决好包括传输介质、信息类型、数据与信号之间的转换、信号传输中的衰减和噪声等内在的一系列问题。</p>
+<p>另外，物理层标准要给出关于物理接口的机械、电气、功能和规程特性，以便于不同的厂商既能够根据公认的标准各自独立的制造设备，又能使各个厂商的产品能够相互兼容。</p>
+<h3 id="数据链路层"><a href="#数据链路层" class="headerlink" title="数据链路层"></a>数据链路层</h3><p>　在物理层发送和接收数据的过程中，会出现一些物理层自己不能解决的问题。</p>
+<p>　例如，当两个节点同时试图在一条线路上发数据时该如何处理？节点如何知道它所接收的数据是否正确，如果噪声　改变了一个分级的目标地址，节点如何察觉它丢失了本应收到的分级呢？这些都是数据链路层所必须负责的工作。</p>
+<p>数据链路层涉及相邻节点之间的可靠传输，数据链路层通过加强物理层传输原始比特的功能，使之对网络层表现为一条无错线路。</p>
+<p>　为了能够实现相邻节点之间的无差错的数据传送，数据链路层在数据传输过程中提供了确认、差错控制和流量控制等机制。</p>
+<h3 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h3><p>网络中的两台计算机进行通信，中间可能要经过许多节点甚至不同的通信子网。网络层的任务就是在通信子网中选择一条合适的路径，使发送端传输层所传下来的数据能够通过所选择的路径到目的端。</p>
+<p>在确定了目标节点的位置后，网络层还要负责引导数据包正确的通过网络，找到通过网络路径的最优路径，即路由选择。</p>
+<p>另外网络层还需要解决异构网络互连问题。</p>
+<h3 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h3><p>传输层的功能是在两个节点建立、维护和释放面向用户的链接。</p>
+<p>它是在传输连接的基础上建立会话连接，并进行数据交换管理，允许数据进行单工、半双工、全双工的传送。会话层提供了令牌管理和同步两种服务功能。</p>
+<h3 id="表示层"><a href="#表示层" class="headerlink" title="表示层"></a>表示层</h3><p>表示层以下的各层只关心可靠的数据传输，而表示层关心的是所传输数据的语义和语法以。</p>
+<p>　它主要涉及处理在两个通信之间所交换信息的表示方式，包括数据格式变换，数据加密与解密，数据压缩与恢复等功能。</p>
+<h3 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h3><p>应用层是OSI参考模型的最高层，负责为用户的应用程序提供网络服务。</p>
+<p>与OSI其它层不同的是，它不为任何其它OSI层提供服务，而只是为OSI模型以外的应用程序提供服务。包括为相互通信的应用程序或进行之间那边拉、进行同步，建立关于错误纠正和控制数据完整性过程的协商等。应用层还包含大量的应用协议，如分布式数据库的访问、文件的交换、电子邮件、虚拟终端等。</p>
+<p>其中物理层、数据链路层和网络层通常被称为媒体层，是网络工程师所研究的对象；传输层、会话层、表示层和应用层则被称为主机层，是用户所面向和关心的内容。</p>
+<ul>
+<li>http协议–应用层</li>
+<li>tcp协议–传输层</li>
+<li>ip协议–网络层</li>
+</ul>
+<p>三层没有本质上的可比性，何况http协是基于tcp连接的。</p>
+<p>TCP&#x2F;IP是传输层协议，主要解决数据如何在网络中传输；而http是应用层协议，主要解决如何包装数据。我们在传输数据时，可以只使用传输层（TCP&#x2F;IP），但那样的话，由于没有应用层，便无法识别数据内容，如果想要使传输的数据有意义，则必须使用应用层协议，应用层协议有很多，有http、ftp、telnet等等，也可以自己定义应用层协议。</p>
+<p>WEB使用http作为传输协议，以封装http文本信息，然后使用tcp&#x2F;ip做传输层协议将它发送到网络上。socket是对tcp&#x2F;ip协议的封装，socket本身不是协议，而是一个调用接口（api），通过socket，我们才能使用TCP&#x2F;IP协议。</p>
+<h2 id="TCP-x2F-IP模型"><a href="#TCP-x2F-IP模型" class="headerlink" title="ＴCP&#x2F;IP模型"></a>ＴCP&#x2F;IP模型</h2><p>TCP&#x2F;IP模型是由美国国防部创建的，所以有时又称DoD（Department of Defense）模型。TCP&#x2F;IP模型分为四层，由下而上分别为网络访问层、网际层、传输层、应用层。</p>
+<p>应指出的是，TCP&#x2F;IP是OSI模型之前的产物，所以两者不存在严格的层对应关系。在TCP&#x2F;IP模型中不存在与OSI的物理层与数据链路层相对应的部分。相反，TCP&#x2F;IP的主要目标是致力于异构网络的互连，所以在OSI的物理层与数据链路层相对应的部分没有作任何限定。</p>
+<p>在TCP&#x2F;IP模型中，网络访问层是TCP&#x2F;IP模型的最低层，负责从网际层将来的IP数据报并将IP数据报通过底层物理网络发送出去。或者从底层物理网络上接收物理帧，抽出IP数据报，交给互联网层。</p>
+<p>网络访问层使采用不同技术和网络硬件的网络之间能够互联，它包括属于操作系统的设驱动器和计算机网络接口卡，以处理具体的硬件物理接口。</p>
+<p>网际层负责独立地将分组从源主机送往目标主机，涉及为分级提供最佳路径的选择和交换功能。并使这一过程与它们所经过的路径和网络无关。</p>
+<p>这好比你寄信时，你并不需要知道它是如何到达目的地的，而只关心它是否到达了。TCP&#x2F;IP模型的互联网层在功能上非常类似于OSI参考模型中的网络层。</p>
+<p>传输层的作用与OSI参考模型中传输层的作用是类似的，即在源结点的两具对等实体之间提供可靠的端到端的数据通信。为保证数据传输的可靠性，传输层协议也提供了确认、差错控制和流量控制等机制。</p>
+<p>另外，由于一般的计算机中，常常是多个应用程序同时访问网络，所以传输层还要提供不同应用程序的标识。</p>
+<p>应用层涉及为用户提供网络应用，并为这些应用提供网络支撑服务。由于TCP&#x2F;IP将所有的应用相关的内容都有归为一层，所以在应用层要处理高层协议、数据表达和对话控制等任务。</p>
+<h2 id="OSI模型和TCP-x2F-IP模型的区别"><a href="#OSI模型和TCP-x2F-IP模型的区别" class="headerlink" title="OSI模型和TCP&#x2F;IP模型的区别"></a>OSI模型和TCP&#x2F;IP模型的区别</h2><p>OSI模型包括了七层，而TCP&#x2F;IP模型只有四层。虽然它们具有功能相当的网络层、传输层和应用层，但其它层并不相同。</p>
+<p>TCP&#x2F;IP模型中没有专门的表示层和会话层，它将与这两层相关的表达、编码和会话控制等功能包含到了应用层中去完成。另外，TCP&#x2F;IP模型还将OSI的数据链路层和物理层包括到一个网络访问层中。</p>
+<p>OSI模型在网络层支持无连接和面向链接的两种服务，而在传输层公支持面向连接的服务。TCP&#x2F;IP模型在互联网层则只支持无连接的一种服务，但在传输层支持面向连接和无连接两种服务。</p>
+<p>TCP&#x2F;IP由于有较少的层次，因而显得更简单，并且作为从因特网（INTERNET）上发展起来的协议，已经成为了网络互连的事实标准。但是，目前还没有实际网络是建立在OSI七层模型基础上的，OSI仅仅作为参考被广泛使用。</p>
+<h2 id="http和socket连接的区别"><a href="#http和socket连接的区别" class="headerlink" title="http和socket连接的区别"></a>http和socket连接的区别</h2><h3 id="短连接"><a href="#短连接" class="headerlink" title="短连接"></a>短连接</h3><p>连接–传输数据–关闭连接<br>http是无状态的，浏览器和服务器每进行一次http操作，就建立一次连接，但任务结束就中断连接。<br>也可以说：短连接是指socket连接后发送后接收数据完成后就马上断开连接。</p>
+<h3 id="长连接"><a href="#长连接" class="headerlink" title="长连接"></a>长连接</h3><p>连接–传输数据–保持连接–传输数据–。。。。–关闭连接<br>长连接指建立socket连接后不管是否使用都保持连接，但安全性较差。</p>
+<h3 id="http长连接"><a href="#http长连接" class="headerlink" title="http长连接"></a>http长连接</h3><p>http也是可以建立长连接的，使用connection:keep-alive，http 1.1默认进行持久连接。http 1.1和http 1.0相比较而言，最大的区别就是增加了拷久连接支持（最新的HTTP1.1可以显示指定keep-live），但还是无状态的，或者说是不可以信任的。</p>
+<h3 id="什么时候用长链接，短链接"><a href="#什么时候用长链接，短链接" class="headerlink" title="什么时候用长链接，短链接"></a>什么时候用长链接，短链接</h3><p>长连接多用于操作频繁，点对点的通讯，而且连连接数不能太多的情况。每个TCP连接都需要三步握手，这需要时间，如果每个操作都是先连接，再操作的话，那么处理速度就会降低很多，所以每个操作完后都不断开，次处理时直接发送数据包就ok了。不用建立TCP连接。例如：数据库的连接用长连接，如果用短连接频繁的通信会造成socket错误，而且频繁的socket创建也是对资源的浪费。</p>
+<p>而像ＷEB网站的http服务一般都是用短连接，因为长连接对于服务端来说会耗费一定资源，而像WEB网站这么频繁的成千上万甚至上亿客户端的连接用短连接会更省一些资源，如果用长连接，而且同时成千上万的用户，那可想而知吧。所以并发量大，但每个用户无需频繁操作情况下用短连接好。</p>
+<p>总之，长连接和短连接的选择要视情况而定。</p>
+<h4 id="http连接"><a href="#http连接" class="headerlink" title="http连接"></a>http连接</h4><p>HTTP协议即超文本传输协议<br>（Ｈypertext Transfer Protocol），是web联网的基础，也是手机联网常用的协议之一，HTTP协议也是建立在TCP协议之上的一种应用。<br>HTTP连接最显著的特点是客户端发送的每次请求都需要服务器回头响应，在请求结束之后，会主动释放连接。从建立连接到关闭连接的过程称为这“一次连接”。</p>
+<p>a) 在HTTP1.0中，客户端的每一次请求都要求建立一次单独的连接，在处理完本次请求后，就自动释放连接。</p>
+<p>b) 在HTTP１.1中则可以在一次连接中处理多个请求，并且请求可以多次重叠进行，不需要等待一个请求结束后再发送下一个请求。</p>
+<p>通常的做法是即使不需要获得任何数据，客户端也保持每隔一断固定的时间向服务器发送一次“保持连接”的请求，服务器在收到该请求后，对客户端进行回复，表明知道客户端“在线”。若服务器长时间无法收到客户端的请求，则认为客户端”下线“，若客户端长时间无法收到服务器的回复，则认为网络已经断开。</p>
+<h4 id="socket"><a href="#socket" class="headerlink" title="socket"></a>socket</h4><p>socket是应用层与TCP&#x2F;IP协议簇通信的中间软件抽象层，它是一组接口。首先让我们通过一组图知道socket在哪里？</p>
+<p>a)套接字（socket）概念</p>
+<p>套接字（socket）是通信的基石，是支持TCP&#x2F;IP协议的网络通信的基本操作单元。它是网络通信过程中端点的抽象表示，包含进行网络通信必须的五种信息：连接使用的协议、本机的IP地址、本地进程的协议端口、远程主机的IP地址、远程进程的协议端口。</p>
+<p>应用层通过传输层进行数据通信时，TCP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。</p>
+<p>为了区别不同应用程序进程和连接，许多计算机操作系统为应用程序与TCP&#x2F;IP协议交互提供了套接字（socket）接口。应用层可以和传输层通过socket接口，区分来自不同应用程序或网络连接的通信，实现数据传输的并发服务。</p>
+<p>b)建立socket连接</p>
+<p>建立socket连接至少需要一对套接字，其中一个运行于客户端，称为clientsocket，另一个运行于服务端，称为serversocket。</p>
+<p>套接字之间的连接过程分为三个步骤：服务器监听，客户端请求，连接确认。</p>
+<p>服务器监听：服务器端套接字并不定位具体的客户端套接字，而是处于等待连接状态，实时监控网络状态，等待客户端的连接请求。</p>
+<p>客户端请求：指客户端的套接字提出连接请求，要连接的目标服务器的套接字。为此客户端的套接字必须首先描述第要连接的服务器的套接字，指出服务器端套接字的地址和端口号，然后就向服务器套接字提出连接请求。</p>
+<p>连接确认：当服务器端套接字监听到或者说接收到客户端套接字的连接请求时，就响应客户端套接字的请求，建立一个新的线程，把服务器端套接字的描述发给客户端，一旦客户端确认了描述，双方就正式建立连接。而服务器端套按字继续处于监听状态，继续接收其它客户端的套接字请求。</p>
+<p>c)socket连接与tcp连接</p>
+<p>创建socket连接时，可以指定使用的传输层协议，socket可以支持不同的传输层协议（TCP或UDP），当使用TCP协议进行连接时，该socket就是TCP连接。</p>
+<p>d)socket连接与http连接</p>
+<p>由于通常情况下socket连接就是tcp连接，因此socket连接一旦建立，通信双方即可始相互发送数据内容，走在到双方连接断开。<br>但在实际网络应用中，客户端到服务器之间的通信往往需要穿戴多个中间节点，例如路由器、网关、防火墙等，大部分防火墙默认会关闭长时间处于非活跃状态的连接而导致socket连接断边，因此需要通过轮询告诉网络，该连接处于活跃状态。</p>
+<p>而http连接使用的是“请求－响应”的方式，不仅在请求时需要建立连接，而且需要客户端向服务器发出请求后，服务器端才能回复数据。</p>
+<p>很多情况下，需要服务器端主动向客户端推送数据，保持客户端与服务器数据的实时同步。</p>
+<p>此时若双方建立的是socket连接，服务器就可以直接将数据传送给客户端；若双方建立的是http连接，则服务器需要等到客户端发送一次请求后才能将数据伟回到客户端，因此，客户端定时向服务器端发送连接请𣷌，不仅可以保持在线，现时也是在“询问”服务器是否有新数据，如果有就将数据伟给客户端。　</p>
+<h3 id="tcp和udp的区别"><a href="#tcp和udp的区别" class="headerlink" title="tcp和udp的区别"></a>tcp和udp的区别</h3><p>tcp:tcp是面向连接的、传输可靠（要保证数据正确性和保证数据顺序）、用于传输大量数据（流模式）、速度慢，建立连接需要开销较多（时间、系统资源等）。</p>
+<p>tcp是一种流模式的协议，是面向连接的，也就是说，在连接持续的过程中，socket中收到的数据都是同同一台主机发出的（支持不考虑），因此，知道保证数据是有序静观默察就行，至于每次读取多少数据不关心。</p>
+<p>udp:udp面向非连接，传输不可靠、用于传输少量数据（数据包模式）、速度快。</p>
+<p>关于tcp是一程流模式的协议，udp是一种数据报模式的协议，这里需要说明一下，tcp是面向连接的，４也就是说，在连接持续的过程中，socket中收到的数据都是同一台主机发出的（劫持不考虑），因此知道保证数据是有序的到达就行了，至于每次读取多少数据自已看着办。</p>
+<p>而udp是无连接的协议，也就是说，只要知道接收端的ip和端口，且网络是可达的，任何主机都可以身接收端发送数据。这个时候，如果一次读取超过一个报文的数据，则会乱套。比如Ａ主机发送了报文P1，主机Ｂ发送了报文P2，如果能够读取超过一个报文的数据，那么就会将P1和P2的数据合并了一起，这样的数据是没有单方的。</p>
+<h3 id="TCP三次握手和四次挥手"><a href="#TCP三次握手和四次挥手" class="headerlink" title="TCP三次握手和四次挥手"></a>TCP三次握手和四次挥手</h3><p>相对于socket开发者，tcp创建过程和连接拆除过程是由tcp&#x2F;ip协议栈自动创建的。因此开发者并不需要控制这个过程。但是对于理解tcp底层动作机制，相当有帮助。因此这里详细的解释一下这两个过程。</p>
+<h3 id="TCP三次握手"><a href="#TCP三次握手" class="headerlink" title="TCP三次握手"></a>TCP三次握手</h3><p>所谓三次扬（three-way handshake），是指建立一个TCP连接时，需要客户端和服务器总共发送３个包。</p>
+<p>三次扬的目的是连接服务器指定端口，建立tcp连接，并同步连接双方的序列号我确认号并交换tcp端口大小信息，在socket编程中，客户端执行connect()时，将触发三次握手。</p>
+<p>产自要了解一下几个标志，SYN（synchronous），同步标志，ACK（acknowledgement），即确认标志，seq应该就是sequence number，序列号的意思，另外还有四次扬的fin，应该是final，表示结束标志。</p>
+<p>第一次握手：客户端发送一个tcp的syn标志位置１的包指明客户打算连接的服务器的端口，以及初始序号x，保存在包头的序号号字段里。</p>
+<p>第二次握手：服务器发回确认包ack应答，即syn标志位和ack标志位均为１，同时将确认序号设置为客户的序号加１，即x+1。</p>
+<p>第三次扬：客户端再次发送确认包ack，syn标志为为0，ack标志位为１。并且把服务器发来的ack序号字段+1，放在确认字段中发送第给对方，并且在数据段放写序号+1。</p>
+<h3 id="TCP四次挥手"><a href="#TCP四次挥手" class="headerlink" title="TCP四次挥手"></a>TCP四次挥手</h3><p>TCP的连接的拆除需要发送四个包，因此称为四次挥手（four-way handshake）。客户端或服务器均可主动发起挥手动作，在socket纺和中，任何一方执行close()操作即可产生挥手操作。</p>
+<p>其实有一个问题，为什么连接的时候是三次握手，关闭的时候却是四次挥手？</p>
+<p>因为当server端收到client端的syn连接请求报文后，可以直接发送syn+ack报文。其中ack报文是用来应答的，syn报文是用来同步的。</p>
+<p>但是关闭连接时，当server端收到fin报文时，很可能并不会立即关闭socket，所以只能先回复一个ack报文，告诉client端，你发送的fin报文我收到了。只有等到我的server端报文都发送完成了，我才能发送fin报文，因此不能一起发送。帮需要四次挥手。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/network/" class="category-chain-item">network</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/OSI/">#OSI</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>OSI</div>
+      <div>https://ywmy.xyz/2018/08/05/OSI/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2018年8月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/08/05/linux%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" title="linux常用命令">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">linux常用命令</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/08/05/iproute2/" title="iproute2">
+                        <span class="hidden-mobile">iproute2</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

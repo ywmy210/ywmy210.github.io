@@ -1,0 +1,824 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="CentOS 7 RAID配置mdadm是multiple devices admin的简称，它是Linux下的一款标准的软件 RAID 管理工具。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 7 RAID配置">
+<meta property="og:url" content="https://ywmy.xyz/2022/09/16/CentOS-7-RAID%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="CentOS 7 RAID配置mdadm是multiple devices admin的简称，它是Linux下的一款标准的软件 RAID 管理工具。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2022-09-16T07:02:16.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.653Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="RAID">
+<meta property="article:tag" content="mdadm">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>CentOS 7 RAID配置 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CentOS 7 RAID配置"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-16 15:02" pubdate>
+          2022年9月16日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          21k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          172 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CentOS 7 RAID配置</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="CentOS-7-RAID配置"><a href="#CentOS-7-RAID配置" class="headerlink" title="CentOS 7 RAID配置"></a>CentOS 7 RAID配置</h1><p>mdadm是multiple devices admin的简称，它是Linux下的一款标准的软件 RAID 管理工具。</p>
+<span id="more"></span>
+<p>在linux系统中目前以MD(Multiple Devices)虚拟块设备的方式实现软件RAID,利用多个底层的块设备虚拟出一个新的虚拟设备,并且利用条带化(stripping)技术将数据块均匀分布到多个磁盘上来提高虚拟设备的读写性能,利用不同的数据冗祭算法来保护用户数据不会因为某个块设备的故障而完全丢失,而且还能在设备被替换后将丢失的数据恢复到新的设备上。</p>
+<p>目前MD支持linear,multipath,raid0(stripping),raid1(mirror),raid4,raid5,raid6,raid10等不同的冗余级别和级成方式,当然也能支持多个RAID陈列的层叠组成raid1 0,raid5 1等类型的陈列。</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>正常情况，可以通过服务器上的raid 阵列卡，来创建RAID磁盘。如果服务器上没有raid 阵列卡，也可以尝试使用mdadm创建软raid。实验在正常的虚拟机上添加四块硬盘，组成raid 5磁盘阵列， 三个块数据加一块备份。</p>
+<h3 id="添加磁盘"><a href="#添加磁盘" class="headerlink" title="添加磁盘"></a>添加磁盘</h3><p>给虚拟机添加四块磁盘，磁盘编号从vd{b,c,d,e}。系统查看已添加的四块磁盘。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># fdisk -l</span><br><br>Disk /dev/vda: 53.7 GB, 53687091200 bytes, 104857600 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0x000a9efb<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/vda1   *        2048     2099199     1048576   83  Linux<br>/dev/vda2         2099200   104857599    51379200   8e  Linux LVM<br><br>Disk /dev/mapper/centos-root: 50.5 GB, 50457477120 bytes, 98549760 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br><br><br>Disk /dev/mapper/centos-swap: 2147 MB, 2147483648 bytes, 4194304 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br><br><br>Disk /dev/vdb: 21.5 GB, 21474836480 bytes, 41943040 sectors         <span class="hljs-comment"># 新添加的磁盘1</span><br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br><br>Disk /dev/vdc: 21.5 GB, 21474836480 bytes, 41943040 sectors         <span class="hljs-comment"># 新添加的磁盘2</span><br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br><br><br>Disk /dev/vdd: 21.5 GB, 21474836480 bytes, 41943040 sectors         <span class="hljs-comment"># 新添加的磁盘3</span><br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br><br><br>Disk /dev/vde: 21.5 GB, 21474836480 bytes, 41943040 sectors         <span class="hljs-comment"># 新添加的磁盘4</span><br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br></code></pre></td></tr></table></figure>
+
+<p>查看原有的文件系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># df -hT</span><br>Filesystem              Type      Size  Used Avail Use% Mounted on<br>devtmpfs                devtmpfs  874M     0  874M   0% /dev<br>tmpfs                   tmpfs     886M  180K  885M   1% /dev/shm<br>tmpfs                   tmpfs     886M   17M  869M   2% /run<br>tmpfs                   tmpfs     886M     0  886M   0% /sys/fs/cgroup<br>/dev/mapper/centos-root xfs        47G  2.5G   45G   6% /<br>/dev/vda1               xfs      1014M  186M  829M  19% /boot<br>tmpfs                   tmpfs     382M     0  382M   0% /run/user/0<br></code></pre></td></tr></table></figure>
+<p>可以看到CentOS的文件系统为xfs。以及各目录挂载的位置。</p>
+<h3 id="磁盘检查"><a href="#磁盘检查" class="headerlink" title="磁盘检查"></a>磁盘检查</h3><p>新添加的磁盘，可以先检查一下，是否已经做过raid。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mdadm -E /dev/vd&#123;b,c,d,e&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="磁盘分区初始化"><a href="#磁盘分区初始化" class="headerlink" title="磁盘分区初始化"></a>磁盘分区初始化</h3><p>分别对新添加的四块磁盘进行分区操作，主要包含以下操作：</p>
+<ul>
+<li>创建新分区 n</li>
+<li>选择分区类型 l</li>
+<li>调整分区类型 t</li>
+<li>Linux raid auto fd</li>
+<li>保存分区配置 w</li>
+<li>查看分区信息 p</li>
+</ul>
+<p>以vdc为例，参考命令块内容操作，其它三个操作一样。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># fdisk /dev/vdc </span><br>Welcome to fdisk (util-linux 2.23.2).<br><br>Changes will remain <span class="hljs-keyword">in</span> memory only, until you decide to write them.<br>Be careful before using the write <span class="hljs-built_in">command</span>.<br><br>Device does not contain a recognized partition table<br>Building a new DOS disklabel with disk identifier 0xbd7a8d98.<br><br>Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): p<br><br>Disk /dev/vdc: 21.5 GB, 21474836480 bytes, 41943040 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0xbd7a8d98<br><br>   Device Boot      Start         End      Blocks   Id  System<br><br>Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): n<br>Partition <span class="hljs-built_in">type</span>:<br>   p   primary (0 primary, 0 extended, 4 free)<br>   e   extended<br>Select (default p): p<br>Partition number (1-4, default 1): <br>First sector (2048-41943039, default 2048): <br>Using default value 2048<br>Last sector, +sectors or +size&#123;K,M,G&#125; (2048-41943039, default 41943039): <br>Using default value 41943039<br>Partition 1 of <span class="hljs-built_in">type</span> Linux and of size 20 GiB is <span class="hljs-built_in">set</span><br><br>Command (m <span class="hljs-keyword">for</span> <span class="hljs-built_in">help</span>): l<br><br> 0  Empty           24  NEC DOS         81  Minix / old Lin bf  Solaris        <br> 1  FAT12           27  Hidden NTFS Win 82  Linux swap / So c1  DRDOS/sec (FAT-<br> 2  XENIX root      39  Plan 9          83  Linux           c4  DRDOS/sec (FAT-<br> 3  XENIX usr       3c  PartitionMagic  84  OS/2 hidden C:  c6  DRDOS/sec (FAT-<br> 4  FAT16 &lt;32M      40  Venix 80286     85  Linux extended  c7  Syrinx         <br> 5  Extended        41  PPC PReP Boot   86  NTFS volume <span class="hljs-built_in">set</span> da  Non-FS data    <br> 6  FAT16           42  SFS             87  NTFS volume <span class="hljs-built_in">set</span> db  CP/M / CTOS / .<br> 7  HPFS/NTFS/exFAT 4d  QNX4.x          88  Linux plaintext de  Dell Utility   <br> 8  AIX             4e  QNX4.x 2nd part 8e  Linux LVM       <span class="hljs-built_in">df</span>  BootIt         <br> 9  AIX bootable    4f  QNX4.x 3rd part 93  Amoeba          e1  DOS access     <br> a  OS/2 Boot Manag 50  OnTrack DM      94  Amoeba BBT      e3  DOS R/O        <br> b  W95 FAT32       51  OnTrack DM6 Aux 9f  BSD/OS          e4  SpeedStor      <br> c  W95 FAT32 (LBA) 52  CP/M            a0  IBM Thinkpad hi eb  BeOS fs        <br> e  W95 FAT16 (LBA) 53  OnTrack DM6 Aux a5  FreeBSD         ee  GPT            <br> f  W95 Ext<span class="hljs-string">&#x27;d (LBA) 54  OnTrackDM6      a6  OpenBSD         ef  EFI (FAT-12/16/</span><br><span class="hljs-string">10  OPUS            55  EZ-Drive        a7  NeXTSTEP        f0  Linux/PA-RISC b</span><br><span class="hljs-string">11  Hidden FAT12    56  Golden Bow      a8  Darwin UFS      f1  SpeedStor      </span><br><span class="hljs-string">12  Compaq diagnost 5c  Priam Edisk     a9  NetBSD          f4  SpeedStor      </span><br><span class="hljs-string">14  Hidden FAT16 &lt;3 61  SpeedStor       ab  Darwin boot     f2  DOS secondary  </span><br><span class="hljs-string">16  Hidden FAT16    63  GNU HURD or Sys af  HFS / HFS+      fb  VMware VMFS    </span><br><span class="hljs-string">17  Hidden HPFS/NTF 64  Novell Netware  b7  BSDI fs         fc  VMware VMKCORE </span><br><span class="hljs-string">18  AST SmartSleep  65  Novell Netware  b8  BSDI swap       fd  Linux raid auto</span><br><span class="hljs-string">1b  Hidden W95 FAT3 70  DiskSecure Mult bb  Boot Wizard hid fe  LANstep        </span><br><span class="hljs-string">1c  Hidden W95 FAT3 75  PC/IX           be  Solaris boot    ff  BBT            </span><br><span class="hljs-string">1e  Hidden W95 FAT1 80  Old Minix      </span><br><span class="hljs-string"></span><br><span class="hljs-string">Command (m for help): t</span><br><span class="hljs-string">Selected partition 1</span><br><span class="hljs-string">Hex code (type L to list all codes): fd</span><br><span class="hljs-string">Changed type of partition &#x27;</span>Linux<span class="hljs-string">&#x27; to &#x27;</span>Linux raid autodetect<span class="hljs-string">&#x27;</span><br><span class="hljs-string"></span><br><span class="hljs-string">Command (m for help): w</span><br><span class="hljs-string">The partition table has been altered!</span><br><span class="hljs-string"></span><br><span class="hljs-string">Calling ioctl() to re-read partition table.</span><br><span class="hljs-string">Syncing disks.</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="验证分区是否为RAID"><a href="#验证分区是否为RAID" class="headerlink" title="验证分区是否为RAID"></a>验证分区是否为RAID</h3><p>再次检查已经分区过的磁盘，得到分区信息如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm -E /dev/vd&#123;b,c,d,e&#125;</span><br>/dev/vdb:<br>   MBR Magic : aa55<br>Partition[0] :     41940992 sectors at         2048 (<span class="hljs-built_in">type</span> fd)<br>/dev/vdc:<br>   MBR Magic : aa55<br>Partition[0] :     41940992 sectors at         2048 (<span class="hljs-built_in">type</span> fd)<br>/dev/vdd:<br>   MBR Magic : aa55<br>Partition[0] :     41940992 sectors at         2048 (<span class="hljs-built_in">type</span> fd)<br>/dev/vde:<br>   MBR Magic : aa55<br>Partition[0] :     41940992 sectors at         2048 (<span class="hljs-built_in">type</span> fd)<br></code></pre></td></tr></table></figure>
+
+<h3 id="创建raid-5磁盘"><a href="#创建raid-5磁盘" class="headerlink" title="创建raid 5磁盘"></a>创建raid 5磁盘</h3><div class="note note-info">
+            <p>mdadm -n 指定磁盘数量， -x 指定备份盘数量， -l 指定raid 级别，数字 5 或 raid5 均可，最后指定原如磁盘设备。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm -Cv /dev/md0 -n3 -l raid5 -x 1 /dev/vd&#123;b,c,d,e&#125;</span><br>mdadm: layout defaults to left-symmetric<br>mdadm: layout defaults to left-symmetric<br>mdadm: chunk size defaults to 512K<br>mdadm: partition table exists on /dev/vdb<br>mdadm: partition table exists on /dev/vdb but will be lost or<br>       meaningless after creating array<br>mdadm: partition table exists on /dev/vdc<br>mdadm: partition table exists on /dev/vdc but will be lost or<br>       meaningless after creating array<br>mdadm: partition table exists on /dev/vdd<br>mdadm: partition table exists on /dev/vdd but will be lost or<br>       meaningless after creating array<br>mdadm: partition table exists on /dev/vde<br>mdadm: partition table exists on /dev/vde but will be lost or<br>       meaningless after creating array<br>mdadm: size <span class="hljs-built_in">set</span> to 20954112K<br>Continue creating array? y<br>mdadm: Defaulting to version 1.2 metadata<br>mdadm: array /dev/md0 started.<br></code></pre></td></tr></table></figure>
+<h3 id="查看raid-创建信息"><a href="#查看raid-创建信息" class="headerlink" title="查看raid 创建信息"></a>查看raid 创建信息</h3><p>创建raid 5 磁盘阵列，可以查看raid创建的进度，见下结果。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># cat /proc/mdstat</span><br>Personalities : [raid6] [raid5] [raid4] <br>md0 : active raid5 vdd[4] vde[3](S) vdc[1] vdb[0]<br>      41908224 blocks super 1.2 level 5, 512k chunk, algorithm 2 [3/2] [UU_]<br>      [===============&gt;.....]  recovery = 75.3% (15780992/20954112) finish=0.8min speed=105513K/sec<br>      <br>unused devices: &lt;none&gt;<br>[root@haproxy-node-a ~]<span class="hljs-comment"># cat /proc/mdstat</span><br>Personalities : [raid6] [raid5] [raid4] <br>md0 : active raid5 vdd[4] vde[3](S) vdc[1] vdb[0]<br>      41908224 blocks super 1.2 level 5, 512k chunk, algorithm 2 [3/2] [UU_]<br>      [=================&gt;...]  recovery = 88.4% (18524672/20954112) finish=0.3min speed=104563K/sec<br>      <br>unused devices: &lt;none&gt;<br>[root@haproxy-node-a ~]<span class="hljs-comment"># cat /proc/mdstat</span><br>Personalities : [raid6] [raid5] [raid4] <br>md0 : active raid5 vdd[4] vde[3](S) vdc[1] vdb[0]<br>      41908224 blocks super 1.2 level 5, 512k chunk, algorithm 2 [3/3] [UUU]<br>      <br>unused devices: &lt;none&gt;<br></code></pre></td></tr></table></figure>
+
+<h3 id="查看raid-5的信息"><a href="#查看raid-5的信息" class="headerlink" title="查看raid 5的信息"></a>查看raid 5的信息</h3><p>同样使用上面的验证命令，这次得到下面的结果：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm -E /dev/vd&#123;b,c,d,e&#125;</span><br>/dev/vdb:<br>          Magic : a92b4efc<br>        Version : 1.2<br>    Feature Map : 0x0<br>     Array UUID : 7860ea0c:fb5693d3:176f627f:be6979c7<br>           Name : haproxy-node-a:0  (<span class="hljs-built_in">local</span> to host haproxy-node-a)<br>  Creation Time : Fri Sep 16 14:04:54 2022<br>     Raid Level : raid5<br>   Raid Devices : 3<br><br> Avail Dev Size : 41908224 sectors (19.98 GiB 21.46 GB)<br>     Array Size : 41908224 KiB (39.97 GiB 42.91 GB)<br>    Data Offset : 34816 sectors<br>   Super Offset : 8 sectors<br>   Unused Space : before=34664 sectors, after=0 sectors<br>          State : clean<br>    Device UUID : 3b365a02:36b9e4fd:ea3f65fc:f5488542<br><br>    Update Time : Fri Sep 16 14:08:20 2022<br>  Bad Block Log : 512 entries available at offset 136 sectors<br>       Checksum : 1086a417 - correct<br>         Events : 18<br><br>         Layout : left-symmetric<br>     Chunk Size : 512K<br><br>   Device Role : Active device 0        <span class="hljs-comment"># 可以看到vdb为激活状态</span><br>   Array State : AAA (<span class="hljs-string">&#x27;A&#x27;</span> == active, <span class="hljs-string">&#x27;.&#x27;</span> == missing, <span class="hljs-string">&#x27;R&#x27;</span> == replacing)<br>/dev/vdc:<br>          Magic : a92b4efc<br>        Version : 1.2<br>    Feature Map : 0x0<br>     Array UUID : 7860ea0c:fb5693d3:176f627f:be6979c7<br>           Name : haproxy-node-a:0  (<span class="hljs-built_in">local</span> to host haproxy-node-a)<br>  Creation Time : Fri Sep 16 14:04:54 2022<br>     Raid Level : raid5<br>   Raid Devices : 3<br><br> Avail Dev Size : 41908224 sectors (19.98 GiB 21.46 GB)<br>     Array Size : 41908224 KiB (39.97 GiB 42.91 GB)<br>    Data Offset : 34816 sectors<br>   Super Offset : 8 sectors<br>   Unused Space : before=34664 sectors, after=0 sectors<br>          State : clean<br>    Device UUID : ae142c9c:9c01f688:82e21f85:4da922be<br><br>    Update Time : Fri Sep 16 14:08:20 2022<br>  Bad Block Log : 512 entries available at offset 136 sectors<br>       Checksum : 39c1cde1 - correct<br>         Events : 18<br><br>         Layout : left-symmetric<br>     Chunk Size : 512K<br><br>   Device Role : Active device 1        <span class="hljs-comment"># 可以看到vdc为激活状态</span><br>   Array State : AAA (<span class="hljs-string">&#x27;A&#x27;</span> == active, <span class="hljs-string">&#x27;.&#x27;</span> == missing, <span class="hljs-string">&#x27;R&#x27;</span> == replacing)<br>/dev/vdd:<br>          Magic : a92b4efc<br>        Version : 1.2<br>    Feature Map : 0x0<br>     Array UUID : 7860ea0c:fb5693d3:176f627f:be6979c7<br>           Name : haproxy-node-a:0  (<span class="hljs-built_in">local</span> to host haproxy-node-a)<br>  Creation Time : Fri Sep 16 14:04:54 2022<br>     Raid Level : raid5<br>   Raid Devices : 3<br><br> Avail Dev Size : 41908224 sectors (19.98 GiB 21.46 GB)<br>     Array Size : 41908224 KiB (39.97 GiB 42.91 GB)<br>    Data Offset : 34816 sectors<br>   Super Offset : 8 sectors<br>   Unused Space : before=34664 sectors, after=0 sectors<br>          State : clean<br>    Device UUID : 2ee270bf:4403d299:95a0f6f2:c4cd9ea5<br><br>    Update Time : Fri Sep 16 14:08:20 2022<br>  Bad Block Log : 512 entries available at offset 136 sectors<br>       Checksum : c3357f96 - correct<br>         Events : 18<br><br>         Layout : left-symmetric<br>     Chunk Size : 512K<br><br>   Device Role : Active device 2        <span class="hljs-comment"># 可以看到vdd为激活状态</span><br>   Array State : AAA (<span class="hljs-string">&#x27;A&#x27;</span> == active, <span class="hljs-string">&#x27;.&#x27;</span> == missing, <span class="hljs-string">&#x27;R&#x27;</span> == replacing)<br>/dev/vde:<br>          Magic : a92b4efc<br>        Version : 1.2<br>    Feature Map : 0x0<br>     Array UUID : 7860ea0c:fb5693d3:176f627f:be6979c7<br>           Name : haproxy-node-a:0  (<span class="hljs-built_in">local</span> to host haproxy-node-a)<br>  Creation Time : Fri Sep 16 14:04:54 2022<br>     Raid Level : raid5<br>   Raid Devices : 3<br><br> Avail Dev Size : 41908224 sectors (19.98 GiB 21.46 GB)<br>     Array Size : 41908224 KiB (39.97 GiB 42.91 GB)<br>    Data Offset : 34816 sectors<br>   Super Offset : 8 sectors<br>   Unused Space : before=34664 sectors, after=0 sectors<br>          State : clean<br>    Device UUID : 452bfa49:99adb562:7602a209:20b2ff3f<br><br>    Update Time : Fri Sep 16 14:08:20 2022<br>  Bad Block Log : 512 entries available at offset 136 sectors<br>       Checksum : c7aeb93c - correct<br>         Events : 18<br><br>         Layout : left-symmetric<br>     Chunk Size : 512K<br><br>   Device Role : spare          <span class="hljs-comment"># 可以看到vde为备份盘</span><br>   Array State : AAA (<span class="hljs-string">&#x27;A&#x27;</span> == active, <span class="hljs-string">&#x27;.&#x27;</span> == missing, <span class="hljs-string">&#x27;R&#x27;</span> == replacing)<br></code></pre></td></tr></table></figure>
+
+<p>上面的信息输出太多了，还可以这样看md的状态，新创建的raid从0开始编号。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm -D /dev/md0 </span><br>/dev/md0:<br>           Version : 1.2<br>     Creation Time : Fri Sep 16 14:04:54 2022<br>        Raid Level : raid5<br>        Array Size : 41908224 (39.97 GiB 42.91 GB)<br>     Used Dev Size : 20954112 (19.98 GiB 21.46 GB)<br>      Raid Devices : 3<br>     Total Devices : 4<br>       Persistence : Superblock is persistent<br><br>       Update Time : Fri Sep 16 14:08:20 2022<br>             State : clean <br>    Active Devices : 3<br>   Working Devices : 4<br>    Failed Devices : 0<br>     Spare Devices : 1<br><br>            Layout : left-symmetric<br>        Chunk Size : 512K<br><br>Consistency Policy : resync<br><br>              Name : haproxy-node-a:0  (<span class="hljs-built_in">local</span> to host haproxy-node-a)<br>              UUID : 7860ea0c:fb5693d3:176f627f:be6979c7<br>            Events : 18<br><br>    Number   Major   Minor   RaidDevice State<br>       0     252       16        0      active <span class="hljs-built_in">sync</span>   /dev/vdb<br>       1     252       32        1      active <span class="hljs-built_in">sync</span>   /dev/vdc<br>       4     252       48        2      active <span class="hljs-built_in">sync</span>   /dev/vdd<br><br>       3     252       64        -      spare   /dev/vde<br></code></pre></td></tr></table></figure>
+<p>如创建的一样，b、c、d三块盘为活跃状态，e为备份盘。</p>
+<h3 id="格式化并挂载raid"><a href="#格式化并挂载raid" class="headerlink" title="格式化并挂载raid"></a>格式化并挂载raid</h3><p>至此我们已经将raid 5创建好了，只需要把md0当成一块正常添加的磁盘使用即可。如实验，将md0格式化为xfs文件系统，并挂载在&#x2F;home目录下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mkfs.xfs -f /dev/md0       </span><br>meta-data=/dev/md0               isize=512    agcount=16, agsize=654720 blks<br>         =                       sectsz=512   attr=2, projid32bit=1<br>         =                       crc=1        finobt=0, sparse=0<br>data     =                       bsize=4096   blocks=10475520, imaxpct=25<br>         =                       sunit=128    swidth=256 blks<br>naming   =version 2              bsize=4096   ascii-ci=0 ftype=1<br><span class="hljs-built_in">log</span>      =internal <span class="hljs-built_in">log</span>           bsize=4096   blocks=5120, version=2<br>         =                       sectsz=512   sunit=8 blks, lazy-count=1<br>realtime =none                   extsz=4096   blocks=0, rtextents=0<br><br><br><br>[root@haproxy-node-a ~]<span class="hljs-comment"># df -hT</span><br>Filesystem              Type      Size  Used Avail Use% Mounted on<br>devtmpfs                devtmpfs  874M     0  874M   0% /dev<br>tmpfs                   tmpfs     886M  200K  885M   1% /dev/shm<br>tmpfs                   tmpfs     886M   17M  869M   2% /run<br>tmpfs                   tmpfs     886M     0  886M   0% /sys/fs/cgroup<br>/dev/mapper/centos-root xfs        47G  2.5G   45G   6% /<br>/dev/vda1               xfs      1014M  186M  829M  19% /boot<br>tmpfs                   tmpfs     382M     0  382M   0% /run/user/0<br>[root@haproxy-node-a ~]<span class="hljs-comment"># mount /dev/md0 /home/</span><br>[root@haproxy-node-a ~]<span class="hljs-comment"># df -hT</span><br>Filesystem              Type      Size  Used Avail Use% Mounted on<br>devtmpfs                devtmpfs  874M     0  874M   0% /dev<br>tmpfs                   tmpfs     886M  200K  885M   1% /dev/shm<br>tmpfs                   tmpfs     886M   17M  869M   2% /run<br>tmpfs                   tmpfs     886M     0  886M   0% /sys/fs/cgroup<br>/dev/mapper/centos-root xfs        47G  2.5G   45G   6% /<br>/dev/vda1               xfs      1014M  186M  829M  19% /boot<br>tmpfs                   tmpfs     382M     0  382M   0% /run/user/0<br>/dev/md0                xfs        40G   33M   40G   1% /home       <span class="hljs-comment"># 新挂载的md0</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="添加自动挂截"><a href="#添加自动挂截" class="headerlink" title="添加自动挂截"></a>添加自动挂截</h3><p>查看分区类型：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># blkid /dev/md0</span><br>/dev/md0: UUID=<span class="hljs-string">&quot;b7e24434-a5a5-4b7f-82f7-8f5bcb7669a2&quot;</span> TYPE=<span class="hljs-string">&quot;xfs&quot;</span> <br></code></pre></td></tr></table></figure>
+
+<p>添加自动挂载：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/fstab<br><span class="hljs-comment">#</span><br><span class="hljs-comment"># /etc/fstab</span><br><span class="hljs-comment"># Created by anaconda on Fri Aug 19 11:44:47 2022</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># Accessible filesystems, by reference, are maintained under &#x27;/dev/disk&#x27;</span><br><span class="hljs-comment"># See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info</span><br><span class="hljs-comment">#</span><br>/dev/mapper/centos-root /                       xfs     defaults        0 0<br>UUID=e79d9b36-6226-4269-a1d1-cff60d68c2e4 /boot                   xfs     defaults        0 0<br>/dev/mapper/centos-swap swap                    swap    defaults        0 0<br>/dev/md0        /home   xfs     defaults        0 0             <span class="hljs-comment"># 写入自动挂载</span><br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>在挂载完，我们可以检查一下挂载信息是否正确。检查fstab语法。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mount -av</span><br>/                        : ignored<br>/boot                    : already mounted<br>swap                     : ignored<br>/home                    : already mounted<br></code></pre></td></tr></table></figure>
+
+<h3 id="保存md配置信息"><a href="#保存md配置信息" class="headerlink" title="保存md配置信息"></a>保存md配置信息</h3><p>写入md0的配置信息至mdadm的配置文件中。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm -D --scan &gt; /etc/mdadm.conf</span><br>[root@haproxy-node-a ~]<span class="hljs-comment"># cat /etc/mdadm.conf </span><br>ARRAY /dev/md0 metadata=1.2 spares=1 name=haproxy-node-a:0 UUID=7860ea0c:fb5693d3:176f627f:be6979c7<br>[root@haproxy-node-a ~]<span class="hljs-comment"># </span><br></code></pre></td></tr></table></figure>
+
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>模拟硬盘故障，扩充或删除硬盘，查看raid 5的变化。</p>
+<h3 id="raid-扩容"><a href="#raid-扩容" class="headerlink" title="raid 扩容"></a>raid 扩容</h3><p>在虚拟机中添加一块磁盘。新添加磁盘信息如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a home]<span class="hljs-comment"># fdisk -l</span><br><br>Disk /dev/vda: 53.7 GB, 53687091200 bytes, 104857600 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0x000a9efb<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/vda1   *        2048     2099199     1048576   83  Linux<br>/dev/vda2         2099200   104857599    51379200   8e  Linux LVM<br><br>Disk /dev/mapper/centos-root: 50.5 GB, 50457477120 bytes, 98549760 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br><br><br>Disk /dev/mapper/centos-swap: 2147 MB, 2147483648 bytes, 4194304 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br><br><br>Disk /dev/vdb: 21.5 GB, 21474836480 bytes, 41943040 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0xaa22accc<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/vdb1            2048    41943039    20970496   fd  Linux raid autodetect<br><br>Disk /dev/vdc: 21.5 GB, 21474836480 bytes, 41943040 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0xbd7a8d98<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/vdc1            2048    41943039    20970496   fd  Linux raid autodetect<br><br>Disk /dev/vdd: 21.5 GB, 21474836480 bytes, 41943040 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0x01dada7d<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/vdd1            2048    41943039    20970496   fd  Linux raid autodetect<br><br>Disk /dev/vde: 21.5 GB, 21474836480 bytes, 41943040 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0x9b826ee3<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/vde1            2048    41943039    20970496   fd  Linux raid autodetect<br><br>Disk /dev/md0: 42.9 GB, 42914021376 bytes, 83816448 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 524288 bytes / 1048576 bytes<br><br><br>Disk /dev/vdf: 21.5 GB, 21474836480 bytes, 41943040 sectors         <span class="hljs-comment"># 新添加的磁盘</span><br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br></code></pre></td></tr></table></figure>
+
+<p>将磁盘vdf初始化，见上面磁盘初始化操作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">fdisk /dev/vdf<br>.........<br>Disk /dev/vdf: 21.5 GB, 21474836480 bytes, 41943040 sectors<br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 512 bytes / 512 bytes<br>Disk label <span class="hljs-built_in">type</span>: dos<br>Disk identifier: 0xea86a973<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/vdf1            2048    41943039    20970496   fd  Linux raid autodetect<br></code></pre></td></tr></table></figure>
+
+<p>将vdf添加到md0。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm --manage /dev/md0 --add /dev/vdf</span><br>mdadm: added /dev/vdf<br></code></pre></td></tr></table></figure>
+
+<p>查看md0中新添加的磁盘状态。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm -D /dev/md0 </span><br>/dev/md0:<br>           Version : 1.2<br>     Creation Time : Fri Sep 16 14:04:54 2022<br>        Raid Level : raid5<br>        Array Size : 41908224 (39.97 GiB 42.91 GB)<br>     Used Dev Size : 20954112 (19.98 GiB 21.46 GB)<br>      Raid Devices : 3<br>     Total Devices : 5<br>       Persistence : Superblock is persistent<br><br>       Update Time : Fri Sep 16 17:42:17 2022<br>             State : clean <br>    Active Devices : 3<br>   Working Devices : 5<br>    Failed Devices : 0<br>     Spare Devices : 2<br><br>            Layout : left-symmetric<br>        Chunk Size : 512K<br><br>Consistency Policy : resync<br><br>              Name : haproxy-node-a:0  (<span class="hljs-built_in">local</span> to host haproxy-node-a)<br>              UUID : 7860ea0c:fb5693d3:176f627f:be6979c7<br>            Events : 19<br><br>    Number   Major   Minor   RaidDevice State<br>       0     252       16        0      active <span class="hljs-built_in">sync</span>   /dev/vdb<br>       1     252       32        1      active <span class="hljs-built_in">sync</span>   /dev/vdc<br>       4     252       48        2      active <span class="hljs-built_in">sync</span>   /dev/vdd<br><br>       3     252       64        -      spare   /dev/vde<br>       5     252       80        -      spare   /dev/vdf        <span class="hljs-comment"># 新扩容上去的vdf成了备份盘</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="扩容"><a href="#扩容" class="headerlink" title="扩容"></a>扩容</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 这里增长的raid-devices = 4 就正确了。数据盘原为3块，一块热备。这里配置了5，即全部成了数据盘。</span><br>[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm --grow /dev/md0 --raid-devices=5</span><br><br>[root@haproxy-node-a ~]<span class="hljs-comment"># mdadm -D /dev/md0 </span><br>/dev/md0:<br>           Version : 1.2<br>     Creation Time : Fri Sep 16 14:04:54 2022<br>        Raid Level : raid5<br>        Array Size : 41908224 (39.97 GiB 42.91 GB)<br>     Used Dev Size : 20954112 (19.98 GiB 21.46 GB)<br>      Raid Devices : 5<br>     Total Devices : 5<br>       Persistence : Superblock is persistent<br><br>       Update Time : Fri Sep 16 20:18:59 2022<br>             State : clean, reshaping <br>    Active Devices : 5<br>   Working Devices : 5<br>    Failed Devices : 0<br>     Spare Devices : 0<br><br>            Layout : left-symmetric<br>        Chunk Size : 512K<br><br>Consistency Policy : resync<br><br>    Reshape Status : 3% complete<br>     Delta Devices : 2, (3-&gt;5)<br><br>              Name : haproxy-node-a:0  (<span class="hljs-built_in">local</span> to host haproxy-node-a)<br>              UUID : 7860ea0c:fb5693d3:176f627f:be6979c7<br>            Events : 35<br><br>    Number   Major   Minor   RaidDevice State<br>       0     252       16        0      active <span class="hljs-built_in">sync</span>   /dev/vdb<br>       1     252       32        1      active <span class="hljs-built_in">sync</span>   /dev/vdc<br>       4     252       48        2      active <span class="hljs-built_in">sync</span>   /dev/vdd<br>       5     252       80        3      active <span class="hljs-built_in">sync</span>   /dev/vdf       <span class="hljs-comment"># 新添加的 vdf已经成了数据盘</span><br>       3     252       64        4      active <span class="hljs-built_in">sync</span>   /dev/vde       <span class="hljs-comment"># 原有热备盘也给配置成了数据盘。</span><br><br><span class="hljs-comment"># 再次查看raid重构进度</span><br>[root@haproxy-node-a ~]<span class="hljs-comment"># cat /proc/mdstat</span><br>Personalities : [raid6] [raid5] [raid4] <br>md0 : active raid5 vdf[5] vdd[4] vde[3] vdc[1] vdb[0]<br>      41908224 blocks super 1.2 level 5, 512k chunk, algorithm 2 [5/5] [UUUUU]<br>      [=========&gt;...........]  reshape = 47.1% (9870848/20954112) finish=15.5min speed=11884K/sec<br><span class="hljs-comment"># 发现已经是五个U了，等raid重构结束</span><br>[root@haproxy-node-a ~]<span class="hljs-comment"># cat /proc/mdstat</span><br>Personalities : [raid6] [raid5] [raid4] <br>md0 : active raid5 vdf[5] vdd[4] vde[3] vdc[1] vdb[0]<br>      41908224 blocks super 1.2 level 5, 512k chunk, algorithm 2 [5/5] [UUUUU]<br>      [==================&gt;..]  reshape = 90.0% (18875904/20954112) finish=1.0min speed=32304K/sec<br>      <br>unused devices: &lt;none&gt;<br>[root@haproxy-node-a ~]<span class="hljs-comment"># cat /proc/mdstat</span><br>Personalities : [raid6] [raid5] [raid4] <br>md0 : active raid5 vdf[5] vdd[4] vde[3] vdc[1] vdb[0]<br>      41908224 blocks super 1.2 level 5, 512k chunk, algorithm 2 [5/5] [UUUUU]<br>      [==================&gt;..]  reshape = 92.3% (19344384/20954112) finish=0.8min speed=32288K/sec<br>      <br>unused devices: &lt;none&gt;<br>[root@haproxy-node-a ~]<span class="hljs-comment"># cat /proc/mdstat</span><br>Personalities : [raid6] [raid5] [raid4] <br>md0 : active raid5 vdf[5] vdd[4] vde[3] vdc[1] vdb[0]<br>      83816448 blocks super 1.2 level 5, 512k chunk, algorithm 2 [5/5] [UUUUU]   <span class="hljs-comment"># raid重构结束</span><br>      <br>unused devices: &lt;none&gt;<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>再看一下md0的磁盘容量，这里需要对比一下扩容前md0的容量：</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">Disk /dev/md0: 42.9 GB, 42914021376 bytes, 83816448 sectors    <span class="hljs-comment"># 扩容前的容量</span><br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 524288 bytes / 1048576 bytes<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>这个是md0扩容后的磁盘容量：</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># fdisk -l</span><br>.........<br>Disk /dev/md0: 85.8 GB, 85828042752 bytes, 167632896 sectors      <span class="hljs-comment"># 扩容后的容量，即上一步把两个热备盘vde,vdf全加上了</span><br>Units = sectors of 1 * 512 = 512 bytes<br>Sector size (logical/physical): 512 bytes / 512 bytes<br>I/O size (minimum/optimal): 524288 bytes / 1048576 bytes<br></code></pre></td></tr></table></figure>
+<h3 id="调整文件系统大小"><a href="#调整文件系统大小" class="headerlink" title="调整文件系统大小"></a>调整文件系统大小</h3><div class="note note-info">
+            <p>到这里，已经把新添加的硬盘添加至md0了。不过会发现，文件系统依然没有变化，这里，需要调整文件系统大小。操作还是对比调整前和调整后，调前调整前的保持不变。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># df -hT</span><br>Filesystem              Type      Size  Used Avail Use% Mounted on<br>devtmpfs                devtmpfs  874M     0  874M   0% /dev<br>tmpfs                   tmpfs     886M  200K  885M   1% /dev/shm<br>tmpfs                   tmpfs     886M   17M  869M   2% /run<br>tmpfs                   tmpfs     886M     0  886M   0% /sys/fs/cgroup<br>/dev/mapper/centos-root xfs        47G  2.5G   45G   6% /<br>/dev/vda1               xfs      1014M  186M  829M  19% /boot<br>tmpfs                   tmpfs     382M     0  382M   0% /run/user/0<br>/dev/md0                xfs        40G   33M   40G   1% /home           <span class="hljs-comment"># 调整前挂载的md0为40G</span><br></code></pre></td></tr></table></figure>
+
+<p>接下来调整xfs文件系统容量，调整使用以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># xfs_growfs -d /home/</span><br>meta-data=/dev/md0               isize=512    agcount=16, agsize=654720 blks<br>         =                       sectsz=512   attr=2, projid32bit=1<br>         =                       crc=1        finobt=0 spinodes=0<br>data     =                       bsize=4096   blocks=10475520, imaxpct=25<br>         =                       sunit=128    swidth=256 blks<br>naming   =version 2              bsize=4096   ascii-ci=0 ftype=1<br><span class="hljs-built_in">log</span>      =internal               bsize=4096   blocks=5120, version=2<br>         =                       sectsz=512   sunit=8 blks, lazy-count=1<br>realtime =none                   extsz=4096   blocks=0, rtextents=0<br>data blocks changed from 10475520 to 20954112         <span class="hljs-comment"># 数据库已经更新</span><br></code></pre></td></tr></table></figure>
+<div class="note note-info">
+            <p>我们再看调整后的结果：</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># df -hT</span><br>Filesystem              Type      Size  Used Avail Use% Mounted on<br>devtmpfs                devtmpfs  874M     0  874M   0% /dev<br>tmpfs                   tmpfs     886M  320K  885M   1% /dev/shm<br>tmpfs                   tmpfs     886M   17M  869M   2% /run<br>tmpfs                   tmpfs     886M     0  886M   0% /sys/fs/cgroup<br>/dev/mapper/centos-root xfs        47G  2.5G   45G   6% /<br>/dev/vda1               xfs      1014M  186M  829M  19% /boot<br>/dev/md0                xfs        80G   34M   80G   1% /home        <span class="hljs-comment"># 这里已经扩容到80G，即为md0扩容后的容量</span><br>tmpfs                   tmpfs     382M     0  382M   0% /run/user/0<br></code></pre></td></tr></table></figure>
+<div class="note note-access">
+            <p>写到这里，我们已经，会了创建raid磁盘阵列，向磁盘阵列中添加硬盘并重构，再扩容到文件系统中。</p>
+          </div>
+
+<p>如上实验，我们挂载的为xfs文件系统，对于其它文件系统，如何调整文件系统大小，这里先停一下，这一篇贴得实在有点长，我们放在下一篇。继续补充raid的其它测试验证及文件系统操作。下文见。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/security/">#security</a>
+      
+        <a href="/tags/linux/">#linux</a>
+      
+        <a href="/tags/RAID/">#RAID</a>
+      
+        <a href="/tags/mdadm/">#mdadm</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CentOS 7 RAID配置</div>
+      <div>https://ywmy.xyz/2022/09/16/CentOS-7-RAID配置/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/16/CentOS-7-RAID%E9%85%8D%E7%BD%AE%E7%BB%AD/" title="CentOS 7 RAID配置续">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CentOS 7 RAID配置续</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/22/CentOS-%E9%83%A8%E7%BD%B2-softether%E6%9C%8D%E5%8A%A1/" title="CentOS 部署 softether服务">
+                        <span class="hidden-mobile">CentOS 部署 softether服务</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

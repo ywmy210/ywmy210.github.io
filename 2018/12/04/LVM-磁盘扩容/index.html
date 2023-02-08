@@ -1,0 +1,768 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="LVM 磁盘扩容linux LVM磁盘管理，添加新硬盘，硬盘扩容操作，记录备忘。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVM 磁盘扩容">
+<meta property="og:url" content="https://ywmy.xyz/2018/12/04/LVM-%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="LVM 磁盘扩容linux LVM磁盘管理，添加新硬盘，硬盘扩容操作，记录备忘。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2018-12-04T12:05:49.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.749Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="lvm">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>LVM 磁盘扩容 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LVM 磁盘扩容"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2018-12-04 20:05" pubdate>
+          2018年12月4日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          75 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">LVM 磁盘扩容</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="LVM-磁盘扩容"><a href="#LVM-磁盘扩容" class="headerlink" title="LVM 磁盘扩容"></a>LVM 磁盘扩容</h1><p>linux LVM磁盘管理，添加新硬盘，硬盘扩容操作，记录备忘。</p>
+<span id="more"></span>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前给公司的同事配置了一台samba服务器，因为主要使用的是UI设计的同事，有大量的共享素材，磁盘很快的已经满了。前两天有同事来告知，映射的网络硬盘已经显示没有可用的空间了。想想那台主机里面的电源，应该可以再挂两个硬盘，于是，对磁盘扩容就玩起来了。</p>
+<p>一张来来说明LVM管理：</p>
+<p><img src="https://blog.ywmy.xyz/linux/LVM.png" srcset="/img/loading.gif" lazyload alt="LVM"></p>
+<hr>
+<h2 id="添加硬盘"><a href="#添加硬盘" class="headerlink" title="添加硬盘"></a>添加硬盘</h2><p>关机，找到一块未用的硬笔，安装在主机里。</p>
+<h2 id="查看硬盘使用情况"><a href="#查看硬盘使用情况" class="headerlink" title="查看硬盘使用情况"></a>查看硬盘使用情况</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -HT<br>文件系统                类型      容量  已用  可用 已用% 挂载点<br>/dev/mapper/centos-root xfs        54G  1.6G   53G    3% /<br>devtmpfs                devtmpfs  2.0G     0  2.0G    0% /dev<br>tmpfs                   tmpfs     2.0G     0  2.0G    0% /dev/shm<br>tmpfs                   tmpfs     2.0G  9.2M  2.0G    1% /run<br>tmpfs                   tmpfs     2.0G     0  2.0G    0% /sys/fs/cgroup<br>/dev/sda1               xfs       518M  228M  290M   44% /boot<br>/dev/mapper/centos-home xfs       942G  933G  9.1G  100% /home   //这里是重点，已经满了<br>tmpfs                   tmpfs     398M     0  398M    0% /run/user/0<br></code></pre></td></tr></table></figure>
+
+<h2 id="创建分区"><a href="#创建分区" class="headerlink" title="创建分区"></a>创建分区</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># fdisk /dev/sdb</span><br>欢迎使用 fdisk (util-linux 2.23.2)。<br><br>更改将停留在内存中，直到您决定将更改写入磁盘。<br>使用写入命令前请三思。<br><br><br>命令(输入 m 获取帮助)：m<br>命令操作<br>   a   toggle a bootable flag<br>   b   edit bsd disklabel<br>   c   toggle the dos compatibility flag<br>   d   delete a partition<br>   g   create a new empty GPT partition table<br>   G   create an IRIX (SGI) partition table<br>   l   list known partition types<br>   m   <span class="hljs-built_in">print</span> this menu<br>   n   add a new partition<br>   o   create a new empty DOS partition table<br>   p   <span class="hljs-built_in">print</span> the partition table<br>   q   quit without saving changes<br>   s   create a new empty Sun disklabel<br>   t   change a partition<span class="hljs-string">&#x27;s system id</span><br><span class="hljs-string">   u   change display/entry units</span><br><span class="hljs-string">   v   verify the partition table</span><br><span class="hljs-string">   w   write table to disk and exit</span><br><span class="hljs-string">   x   extra functionality (experts only)</span><br><span class="hljs-string"></span><br><span class="hljs-string">命令(输入 m 获取帮助)：d</span><br><span class="hljs-string">已选择分区 1</span><br><span class="hljs-string">分区 1 已删除</span><br><span class="hljs-string"></span><br><span class="hljs-string">命令(输入 m 获取帮助)：n</span><br><span class="hljs-string">Partition type:</span><br><span class="hljs-string">   p   primary (0 primary, 0 extended, 4 free)</span><br><span class="hljs-string">   e   extended</span><br><span class="hljs-string">Select (default p): p</span><br><span class="hljs-string">分区号 (1-4，默认 1)：</span><br><span class="hljs-string">起始 扇区 (2048-976773167，默认为 2048)：</span><br><span class="hljs-string">将使用默认值 2048</span><br><span class="hljs-string">Last 扇区, +扇区 or +size&#123;K,M,G&#125; (2048-976773167，默认为 976773167)：</span><br><span class="hljs-string">将使用默认值 976773167</span><br><span class="hljs-string">分区 1 已设置为 Linux 类型，大小设为 465.8 GiB</span><br><span class="hljs-string"></span><br><span class="hljs-string">命令(输入 m 获取帮助)：t</span><br><span class="hljs-string">已选择分区 1</span><br><span class="hljs-string">Hex 代码(输入 L 列出所有代码)：L</span><br><span class="hljs-string"></span><br><span class="hljs-string"> 0  空              24  NEC DOS         81  Minix / 旧 Linu bf  Solaris</span><br><span class="hljs-string"> 1  FAT12           27  隐藏的 NTFS Win  82  Linux 交换 / So c1  DRDOS/sec (FAT-</span><br><span class="hljs-string"> 2  XENIX root      39  Plan 9          83  Linux           c4  DRDOS/sec (FAT-</span><br><span class="hljs-string"> 3  XENIX usr       3c  PartitionMagic  84  OS/2 隐藏的 C:  c6  DRDOS/sec (FAT-</span><br><span class="hljs-string"> 4  FAT16 &lt;32M      40  Venix 80286     85  Linux 扩展      c7  Syrinx</span><br><span class="hljs-string"> 5  扩展            41  PPC PReP Boot   86  NTFS 卷集       da  非文件系统数据</span><br><span class="hljs-string"> 6  FAT16           42  SFS             87  NTFS 卷集       db  CP/M / CTOS / .</span><br><span class="hljs-string"> 7  HPFS/NTFS/exFAT 4d  QNX4.x          88  Linux 纯文本    de  Dell 工具</span><br><span class="hljs-string"> 8  AIX             4e  QNX4.x 第2部分  8e  Linux LVM       df  BootIt</span><br><span class="hljs-string"> 9  AIX 可启动      4f  QNX4.x 第3部分  93  Amoeba          e1  DOS 访问</span><br><span class="hljs-string"> a  OS/2 启动管理器 50  OnTrack DM      94  Amoeba BBT      e3  DOS R/O</span><br><span class="hljs-string"> b  W95 FAT32       51  OnTrack DM6 Aux 9f  BSD/OS          e4  SpeedStor</span><br><span class="hljs-string"> c  W95 FAT32 (LBA) 52  CP/M            a0  IBM Thinkpad 休 eb  BeOS fs</span><br><span class="hljs-string"> e  W95 FAT16 (LBA) 53  OnTrack DM6 Aux a5  FreeBSD         ee  GPT</span><br><span class="hljs-string"> f  W95 扩展 (LBA)  54  OnTrackDM6      a6  OpenBSD         ef  EFI (FAT-12/16/</span><br><span class="hljs-string">10  OPUS            55  EZ-Drive        a7  NeXTSTEP        f0  Linux/PA-RISC  </span><br><span class="hljs-string">11  隐藏的 FAT12    56  Golden Bow      a8  Darwin UFS      f1  SpeedStor</span><br><span class="hljs-string">12  Compaq 诊断     5c  Priam Edisk     a9  NetBSD          f4  SpeedStor</span><br><span class="hljs-string">14  隐藏的 FAT16 &lt;3 61  SpeedStor       ab  Darwin 启动     f2  DOS 次要</span><br><span class="hljs-string">16  隐藏的 FAT16    63  GNU HURD or Sys af  HFS / HFS+      fb  VMware VMFS</span><br><span class="hljs-string">17  隐藏的 HPFS/NTF 64  Novell Netware  b7  BSDI fs         fc  VMware VMKCORE</span><br><span class="hljs-string">18  AST 智能睡眠    65  Novell Netware  b8  BSDI swap       fd  Linux raid 自动</span><br><span class="hljs-string">1b  隐藏的 W95 FAT3 70  DiskSecure 多启 bb  Boot Wizard 隐  fe  LANstep</span><br><span class="hljs-string">1c  隐藏的 W95 FAT3 75  PC/IX           be  Solaris 启动    ff  BBT</span><br><span class="hljs-string">1e  隐藏的 W95 FAT1 80  旧 Minix</span><br><span class="hljs-string">Hex 代码(输入 L 列出所有代码)：df</span><br><span class="hljs-string">已将分区“Linux”的类型更改为“BootIt”</span><br><span class="hljs-string"></span><br><span class="hljs-string">命令(输入 m 获取帮助)：w</span><br><span class="hljs-string">The partition table has been altered!</span><br><span class="hljs-string"></span><br><span class="hljs-string">Calling ioctl() to re-read partition table.</span><br><span class="hljs-string">正在同步磁盘。</span><br><span class="hljs-string">[root@server ~]# fdisk /dev/sdb</span><br><span class="hljs-string">欢迎使用 fdisk (util-linux 2.23.2)。</span><br><span class="hljs-string"></span><br><span class="hljs-string">更改将停留在内存中，直到您决定将更改写入磁盘。</span><br><span class="hljs-string">使用写入命令前请三思。</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">命令(输入 m 获取帮助)：p</span><br><span class="hljs-string"></span><br><span class="hljs-string">磁盘 /dev/sdb：500.1 GB, 500107862016 字节，976773168 个扇区</span><br><span class="hljs-string">Units = 扇区 of 1 * 512 = 512 bytes</span><br><span class="hljs-string">扇区大小(逻辑/物理)：512 字节 / 512 字节</span><br><span class="hljs-string">I/O 大小(最小/最佳)：512 字节 / 512 字节</span><br><span class="hljs-string">磁盘标签类型：dos</span><br><span class="hljs-string">磁盘标识符：0xc738c738</span><br><span class="hljs-string"></span><br><span class="hljs-string">   设备 Boot      Start         End      Blocks   Id  System</span><br><span class="hljs-string">/dev/sdb1            2048   976773167   488385560   df  BootIt</span><br><span class="hljs-string"></span><br><span class="hljs-string">命令(输入 m 获取帮助)：q</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="查看分区信息"><a href="#查看分区信息" class="headerlink" title="查看分区信息"></a>查看分区信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># fdisk -l</span><br>磁盘 /dev/sda：1000.2 GB, 1000204886016 字节，1953525168 个扇区<br>Units = 扇区 of 1 * 512 = 512 bytes<br>扇区大小(逻辑/物理)：512 字节 / 4096 字节<br>I/O 大小(最小/最佳)：4096 字节 / 4096 字节<br>磁盘标签类型：dos<br>磁盘标识符：0x000b0c67<br><br>   设备 Boot      Start         End      Blocks   Id  System<br>/dev/sda1   *        2048     1026047      512000   83  Linux<br>/dev/sda2         1026048  1953523711   976248832   8e  Linux LVM<br><br>磁盘 /dev/sdb：500.1 GB, 500107862016 字节，976773168 个扇区<br>Units = 扇区 of 1 * 512 = 512 bytes<br>扇区大小(逻辑/物理)：512 字节 / 512 字节<br>I/O 大小(最小/最佳)：512 字节 / 512 字节<br>磁盘标签类型：dos<br>磁盘标识符：0xc738c738<br><br>   设备 Boot      Start         End      Blocks   Id  System<br>/dev/sdb1            2048   976773167   488385560   <span class="hljs-built_in">df</span>  BootIt<br><br>磁盘 /dev/mapper/centos-root：53.7 GB, 53687091200 字节，104857600 个扇区<br>Units = 扇区 of 1 * 512 = 512 bytes<br>扇区大小(逻辑/物理)：512 字节 / 4096 字节<br>I/O 大小(最小/最佳)：4096 字节 / 4096 字节<br><br>磁盘 /dev/mapper/centos-swap：4160 MB, 4160749568 字节，8126464 个扇区<br>Units = 扇区 of 1 * 512 = 512 bytes<br>扇区大小(逻辑/物理)：512 字节 / 4096 字节<br>I/O 大小(最小/最佳)：4096 字节 / 4096 字节<br><br>磁盘 /dev/mapper/centos-home：941.8 GB, 941759660032 字节，1839374336 个扇区  //记住这个<br>Units = 扇区 of 1 * 512 = 512 bytes<br>扇区大小(逻辑/物理)：512 字节 / 4096 字节<br>I/O 大小(最小/最佳)：4096 字节 / 4096 字节<br></code></pre></td></tr></table></figure>
+
+<h3 id="查看volume-group-信息"><a href="#查看volume-group-信息" class="headerlink" title="查看volume group 信息"></a>查看volume group 信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># vgdisplay</span><br>  --- Volume group ---<br>  VG Name               centos          //记住这个<br>  System ID<br>  Format                lvm2<br>  Metadata Areas        1<br>  Metadata Sequence No  4<br>  VG Access             <span class="hljs-built_in">read</span>/write<br>  VG Status             resizable<br>  MAX LV                0<br>  Cur LV                3<br>  Open LV               3<br>  Max PV                0<br>  Cur PV                1<br>  Act PV                1<br>  VG Size               &lt;931.02 GiB<br>  PE Size               4.00 MiB<br>  Total PE              238341<br>  Alloc PE / Size       238325 / &lt;930.96 GiB<br>  Free  PE / Size       16 / 64.00 MiB<br>  VG UUID               pSvviC-2h2k-AA3P-OUpk-OvtT-SXWd-qZ2dQa<br></code></pre></td></tr></table></figure>
+
+<h3 id="查看logical-volume"><a href="#查看logical-volume" class="headerlink" title="查看logical volume"></a>查看logical volume</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># vgdisplay</span><br>  --- Volume group ---<br>  VG Name               centos<br>  System ID<br>  Format                lvm2<br>  Metadata Areas        1<br>  Metadata Sequence No  4<br>  VG Access             <span class="hljs-built_in">read</span>/write<br>  VG Status             resizable<br>  MAX LV                0<br>  Cur LV                3<br>  Open LV               3<br>  Max PV                0<br>  Cur PV                1<br>  Act PV                1<br>  VG Size               &lt;931.02 GiB<br>  PE Size               4.00 MiB<br>  Total PE              238341<br>  Alloc PE / Size       238325 / &lt;930.96 GiB<br>  Free  PE / Size       16 / 64.00 MiB<br>  VG UUID               pSvviC-2h2k-AA3P-OUpk-OvtT-SXWd-qZ2dQa<br></code></pre></td></tr></table></figure>
+
+<h2 id="创建physical-volume"><a href="#创建physical-volume" class="headerlink" title="创建physical volume"></a>创建physical volume</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># pvcreate /dev/sdb1</span><br>  Physical volume <span class="hljs-string">&quot;/dev/sdb1&quot;</span> successfully created.<br></code></pre></td></tr></table></figure>
+
+<h2 id="将physical-volume扩展到volume-group"><a href="#将physical-volume扩展到volume-group" class="headerlink" title="将physical volume扩展到volume group"></a>将physical volume扩展到volume group</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># vgextend centos /dev/sdb1    //centos 为volume group名称</span><br>  Volume group <span class="hljs-string">&quot;centos&quot;</span> successfully extended<br></code></pre></td></tr></table></figure>
+
+<h2 id="将sdb1容量扩展至-x2F-home"><a href="#将sdb1容量扩展至-x2F-home" class="headerlink" title="将sdb1容量扩展至&#x2F;home"></a>将sdb1容量扩展至&#x2F;home</h2><h3 id="查看physical-volume"><a href="#查看physical-volume" class="headerlink" title="查看physical volume"></a>查看physical volume</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># pvdisplay </span><br>  --- Physical volume ---<br>  PV Name               /dev/sda2<br>  VG Name               centos<br>  PV Size               931.02 GiB / not usable 4.00 MiB<br>  Allocatable           <span class="hljs-built_in">yes</span> <br>  PE Size               4.00 MiB<br>  Total PE              238341<br>  Free PE               16<br>  Allocated PE          238325<br>  PV UUID               9PCjzM-KHZJ-mDF2-Qb8d-E6Ye-4elf-AdDi4O<br><br>  --- Physical volume ---<br>  PV Name               /dev/sdb1<br>  VG Name               centos<br>  PV Size               465.76 GiB / not usable 3.02 MiB   //新挂的500GB盘<br>  Allocatable           <span class="hljs-built_in">yes</span> <br>  PE Size               4.00 MiB<br>  Total PE              119234<br>  Free PE               119234<br>  Allocated PE          0<br>  PV UUID               eWCdST-avv3-6Asl-KrdI-fS0O-Kmqm-bjosEU<br></code></pre></td></tr></table></figure>
+
+<h3 id="查看logical-volume信息"><a href="#查看logical-volume信息" class="headerlink" title="查看logical volume信息"></a>查看logical volume信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># lvdisplay </span><br>  --- Logical volume ---<br>  LV Path                /dev/centos/swap<br>  LV Name                swap<br>  VG Name                centos<br>  LV UUID                VGPZIE-CFT1-70zk-1MGp-s0ce-330x-jytZpX<br>  LV Write Access        <span class="hljs-built_in">read</span>/write<br>  LV Creation host, time localhost.localdomain, 2018-09-26 15:02:00 +0800<br>  LV Status              available<br>  <span class="hljs-comment"># open                 2</span><br>  LV Size                &lt;3.88 GiB<br>  Current LE             992<br>  Segments               1<br>  Allocation             inherit<br>  Read ahead sectors     auto<br>  - currently <span class="hljs-built_in">set</span> to     256<br>  Block device           253:1<br><br>  --- Logical volume ---<br>  LV Path                /dev/centos/home<br>  LV Name                home<br>  VG Name                centos<br>  LV UUID                S3dfG3-rZyv-nR1t-WuLo-0TBt-y6PM-1ZU7Fh<br>  LV Write Access        <span class="hljs-built_in">read</span>/write<br>  LV Creation host, time localhost.localdomain, 2018-09-26 15:02:01 +0800<br>  LV Status              available<br>  <span class="hljs-comment"># open                 1</span><br>  LV Size                877.08 GiB       //这里是之前已经满的那块盘<br>  Current LE             224533<br>  Segments               1<br>  Allocation             inherit<br>  Read ahead sectors     auto<br>  - currently <span class="hljs-built_in">set</span> to     256<br>  Block device           253:2<br><br>  --- Logical volume ---<br>  LV Path                /dev/centos/root<br>  LV Name                root<br>  VG Name                centos<br>  LV UUID                IKM0LU-JsZh-LYJ1-bacl-oV8t-lySs-sEUGlS<br>  LV Write Access        <span class="hljs-built_in">read</span>/write<br>  LV Creation host, time localhost.localdomain, 2018-09-26 15:02:05 +0800<br>  LV Status              available<br>  <span class="hljs-comment"># open                 1</span><br>  LV Size                50.00 GiB      //这里是新挂的盘<br>  Current LE             12800<br>  Segments               1<br>  Allocation             inherit<br>  Read ahead sectors     auto<br>  - currently <span class="hljs-built_in">set</span> to     256<br>  Block device           253:0<br></code></pre></td></tr></table></figure>
+
+<h3 id="查看系统挂载信息"><a href="#查看系统挂载信息" class="headerlink" title="查看系统挂载信息"></a>查看系统挂载信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /etc/fstab <br><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># /etc/fstab</span><br><span class="hljs-comment"># Created by anaconda on Wed Sep 26 15:02:07 2018</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># Accessible filesystems, by reference, are maintained under &#x27;/dev/disk&#x27;</span><br><span class="hljs-comment"># See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info</span><br><span class="hljs-comment">#</span><br>/dev/mapper/centos-root /                       xfs     defaults        0 0<br>UUID=ad148335-aa47-4c16-a2bf-9e4727e98749 /boot                   xfs     defaults        0 0<br>/dev/mapper/centos-home /home                   xfs     defaults        0 0    //看这里<br>/dev/mapper/centos-swap swap                    swap    defaults        0 0<br></code></pre></td></tr></table></figure>
+
+<p>将新挂的盘整个扩容到&#x2F;home下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">lvextend -l +100%FREE /dev/mapper/centos-home<br>  Size of logical volume centos/home changed from 877.08 GiB (224533 extents) to 1.31 TiB (343783 extents).<br>  Logical volume centos/home successfully resized.   //容量已经从877GB更为1.31TB了。<br></code></pre></td></tr></table></figure>
+
+<h3 id="确认磁盘使用情况"><a href="#确认磁盘使用情况" class="headerlink" title="确认磁盘使用情况"></a>确认磁盘使用情况</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># df -HT</span><br>文件系统                类型      容量  已用  可用 已用% 挂载点<br>/dev/mapper/centos-root xfs        54G  1.6G   53G    3% /<br>devtmpfs                devtmpfs  2.0G     0  2.0G    0% /dev<br>tmpfs                   tmpfs     2.0G     0  2.0G    0% /dev/shm<br>tmpfs                   tmpfs     2.0G  9.2M  2.0G    1% /run<br>tmpfs                   tmpfs     2.0G     0  2.0G    0% /sys/fs/cgroup<br>/dev/sda1               xfs       518M  228M  290M   44% /boot<br>/dev/mapper/centos-home xfs       942G  933G  9.1G  100% /home      //好像还是没有变化，新的盘没有挂上来<br>tmpfs                   tmpfs     398M     0  398M    0% /run/user/0<br></code></pre></td></tr></table></figure>
+
+<h3 id="刷新文件系统"><a href="#刷新文件系统" class="headerlink" title="刷新文件系统"></a>刷新文件系统</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@server ~]<span class="hljs-comment"># xfs_growfs /dev/mapper/centos-home </span><br>meta-data=/dev/mapper/centos-home isize=256    agcount=4, agsize=57480448 blks<br>         =                       sectsz=4096  attr=2, projid32bit=1<br>         =                       crc=0        finobt=0 spinodes=0<br>data     =                       bsize=4096   blocks=229921792, imaxpct=25<br>         =                       sunit=0      swidth=0 blks<br>naming   =version 2              bsize=4096   ascii-ci=0 ftype=0<br><span class="hljs-built_in">log</span>      =internal               bsize=4096   blocks=112266, version=2<br>         =                       sectsz=4096  sunit=1 blks, lazy-count=1<br>realtime =none                   extsz=4096   blocks=0, rtextents=0<br>data blocks changed from 229921792 to 352033792<br></code></pre></td></tr></table></figure>
+
+<p>因为centos默认的文件系统为xfs。如果创建的文件系统为ext3&#x2F;ext4则使用下面命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">resize2fs /dev/mapper/centos-home<br></code></pre></td></tr></table></figure>
+
+<h3 id="再次确认磁盘使用信息"><a href="#再次确认磁盘使用信息" class="headerlink" title="再次确认磁盘使用信息"></a>再次确认磁盘使用信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">df</span> -HT<br>文件系统                类型      容量  已用  可用 已用% 挂载点<br>/dev/mapper/centos-root xfs        54G  1.6G   53G    3% /<br>devtmpfs                devtmpfs  2.0G     0  2.0G    0% /dev<br>tmpfs                   tmpfs     2.0G     0  2.0G    0% /dev/shm<br>tmpfs                   tmpfs     2.0G  9.2M  2.0G    1% /run<br>tmpfs                   tmpfs     2.0G     0  2.0G    0% /sys/fs/cgroup<br>/dev/sda1               xfs       518M  228M  290M   44% /boot<br>/dev/mapper/centos-home xfs       1.5T  933G  510G   65% /home      //看这里，磁盘已经加到1.5TB<br>tmpfs                   tmpfs     398M     0  398M    0% /run/user/0<br></code></pre></td></tr></table></figure>
+
+<p>扩容完成，参考链接请戳：</p>
+<p>参考1：<a target="_blank" rel="noopener" href="https://linux.cn/article-9168-1.html">LVM逻辑卷管理</a></p>
+<p>参考2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/u012439646/article/details/73380197">Centos 7 利用LVM实现动态扩容</a></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ol>
+<li><p>创建分区                                        #fdisk &#x2F;dev&#x2F;sdb</p>
+</li>
+<li><p>创建物理卷                                      #pvcreat &#x2F;dev&#x2F;sdb1</p>
+</li>
+<li><p>查看卷组名称及使用情况                            #vgdisplay</p>
+</li>
+<li><p>将物理卷扩展到卷组                               #vgextend centos &#x2F;dev&#x2F;sdb1   (此处‘centos’是卷组名称)</p>
+</li>
+<li><p>将卷组中空闲空间扩展到 &#x2F;home                     #lvextend -l +100%FREE &#x2F;dev&#x2F;mapper&#x2F;centos-home</p>
+</li>
+<li><p>刷新文件系统是扩容生效                           #xfs_growfs &#x2F;dev&#x2F;mapper&#x2F;centos-home    (ext4使用这个)resize2fs &#x2F;dev&#x2F;mapper&#x2F;centos-home</p>
+</li>
+</ol>
+<p>注：使用reiserfs 文件系统代替ext3&#x2F;ext4：<em>resize_reiserfs &#x2F;dev&#x2F;mapper&#x2F;drore-home</em></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/lvm/">#lvm</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LVM 磁盘扩容</div>
+      <div>https://ywmy.xyz/2018/12/04/LVM-磁盘扩容/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2018年12月4日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/12/10/LVM%E5%91%BD%E4%BB%A4%E7%9B%B8%E5%85%B3/" title="LVM命令相关">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LVM命令相关</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/12/01/U%E7%9B%98%E5%A4%9A%E5%90%AF%E5%8A%A8/" title="U盘多启动">
+                        <span class="hidden-mobile">U盘多启动</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

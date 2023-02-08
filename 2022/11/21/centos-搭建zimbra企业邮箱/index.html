@@ -1,0 +1,841 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="centos 7 搭建zimbra企业邮箱鉴于前面搭建zabbix时，用到的邮件告警信息，由于脚本的那个方法已经不在适用了。所以尝试自己搭建一个邮件系统，来测试关于邮件告警相关的推送。搭建邮件服务器，考虑到使用和部署，以及网络上相关的部署参考信息，选择了zimbra。一个开源的企业级邮件服务。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos 搭建zimbra企业邮箱">
+<meta property="og:url" content="https://ywmy.xyz/2022/11/21/centos-%E6%90%AD%E5%BB%BAzimbra%E4%BC%81%E4%B8%9A%E9%82%AE%E7%AE%B1/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="centos 7 搭建zimbra企业邮箱鉴于前面搭建zabbix时，用到的邮件告警信息，由于脚本的那个方法已经不在适用了。所以尝试自己搭建一个邮件系统，来测试关于邮件告警相关的推送。搭建邮件服务器，考虑到使用和部署，以及网络上相关的部署参考信息，选择了zimbra。一个开源的企业级邮件服务。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2022-11-21T12:55:03.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.657Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="zimbra mail">
+<meta property="article:tag" content="mail">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>centos 搭建zimbra企业邮箱 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="centos 搭建zimbra企业邮箱"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-11-21 20:55" pubdate>
+          2022年11月21日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          13k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          108 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">centos 搭建zimbra企业邮箱</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="centos-7-搭建zimbra企业邮箱"><a href="#centos-7-搭建zimbra企业邮箱" class="headerlink" title="centos 7 搭建zimbra企业邮箱"></a>centos 7 搭建zimbra企业邮箱</h1><p>鉴于前面搭建zabbix时，用到的邮件告警信息，由于脚本的那个方法已经不在适用了。所以尝试自己搭建一个邮件系统，来测试关于邮件告警相关的推送。搭建邮件服务器，考虑到使用和部署，以及网络上相关的部署参考信息，选择了zimbra。一个开源的企业级邮件服务。</p>
+<span id="more"></span>
+
+<h2 id="搭建环境及需求准备"><a href="#搭建环境及需求准备" class="headerlink" title="搭建环境及需求准备"></a>搭建环境及需求准备</h2><p>在搭建一个邮件服务器前，需要有以下准备：</p>
+<p>1、邮件服务程序，这里选择了开源的zimbra<br>2、可用的服务器硬件<br>3、ISP公网出口，以及已经备案的端口（包含不限定80、443、25等）<br>4、已经备案的域名，域名证书的购买</p>
+<p>完成搭建需要的配置项:</p>
+<p>1、公网出口无冲突的服务映射<br>2、zimbra依赖dns服务，需要在服务器上部署dns服务<br>3、处理站内发信的各种错误<br>4、域名A记录，mx记录，txt记录，SFP记录<br>5、处理对外发信的信任问题，即被反垃圾了邮件联盟识别为垃圾邮件退信</p>
+<h3 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h3><p>操作系统：CentOS Linux release 7.9.2009 (Core)<br>zimbra版本：Zimbra 8.8.12_GA_3844</p>
+<h4 id="停用centos自带的postfix服务"><a href="#停用centos自带的postfix服务" class="headerlink" title="停用centos自带的postfix服务"></a>停用centos自带的postfix服务</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl <span class="hljs-built_in">disable</span> postfix<br>systemctl stop postfix<br>yum remove postfix<br></code></pre></td></tr></table></figure>
+
+<h4 id="更新系统和安装程序依赖"><a href="#更新系统和安装程序依赖" class="headerlink" title="更新系统和安装程序依赖"></a>更新系统和安装程序依赖</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum update<br>yum install libidn gmp perl perl-core ntpl nmap sudo sysstat sqlite libaio libstdc++ wget unzip<br></code></pre></td></tr></table></figure>
+
+<h4 id="更改主机名"><a href="#更改主机名" class="headerlink" title="更改主机名"></a>更改主机名</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">hostnamectl set-hostname mail.ywmy.xyz  <span class="hljs-comment"># 这里设置你的域名，示例参考</span><br>vim /etc/hosts<br><span class="hljs-comment"># 添加主机名</span><br>192.168.10.71   mail.ywmy.xyz mail      <span class="hljs-comment"># 参考示例</span><br></code></pre></td></tr></table></figure>
+
+<p>更改主机名后，重启服务器。</p>
+<h4 id="关闭selinux"><a href="#关闭selinux" class="headerlink" title="关闭selinux"></a>关闭selinux</h4><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs routeros">vim /etc/selinux<span class="hljs-built_in">/config</span><br><span class="hljs-built_in"></span><br><span class="hljs-comment"># This file controls the state of SELinux on the system.</span><br><span class="hljs-comment"># SELINUX= can take one of these three values:</span><br><span class="hljs-comment">#     enforcing - SELinux security policy is enforced.</span><br><span class="hljs-comment">#     permissive - SELinux prints warnings instead of enforcing.</span><br><span class="hljs-comment">#     disabled - No SELinux policy is loaded.</span><br><span class="hljs-attribute">SELINUX</span>=disabled    # 配置这里<br><span class="hljs-comment"># SELINUXTYPE= can take one of three two values:</span><br><span class="hljs-comment">#     targeted - Targeted processes are protected,</span><br><span class="hljs-comment">#     minimum - Modification of targeted policy. Only selected processes are protected. </span><br><span class="hljs-comment">#     mls - Multi Level Security protection.</span><br><span class="hljs-attribute">SELINUXTYPE</span>=targeted <br></code></pre></td></tr></table></figure>
+
+<h2 id="安装zimbra服务程序"><a href="#安装zimbra服务程序" class="headerlink" title="安装zimbra服务程序"></a>安装zimbra服务程序</h2><h3 id="下载程序"><a href="#下载程序" class="headerlink" title="下载程序"></a>下载程序</h3><p>zimbra服务程序的开源版本需要在官方注册后下载。下载的链接[zimbra download][1]</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /tmp<br>wget https://files.zimbra.com/downloads/8.8.12_GA/zcs-8.8.12_GA_3794.RHEL7_64.20190329045002.tgz<br></code></pre></td></tr></table></figure>
+
+<h3 id="安装zimbra服务程序-1"><a href="#安装zimbra服务程序-1" class="headerlink" title="安装zimbra服务程序"></a>安装zimbra服务程序</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 解压程序包</span><br>tar -xzvf zcs-8.8.12_GA_3794.RHEL7_64.20190329045002.tgz <br><span class="hljs-comment"># 安装程序</span><br><span class="hljs-built_in">cd</span> zcs-8.8.12_GA_3794.RHEL7_64.20190329045002<br>./install.sh<br></code></pre></td></tr></table></figure>
+
+<p>程序由安装脚本自动执行，选择对应的设置项。zimbra的程序主体大概包含以下各个组件，参考执行程序回示如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@mail zcs-8.8.12_GA_3794.RHEL7_64.20190329045002]<span class="hljs-comment"># ./install.sh </span><br><br>Operations logged to /tmp/install.log.3PNassAP<br>Checking <span class="hljs-keyword">for</span> existing installation...<br>    zimbra-drive...NOT FOUND<br>    zimbra-imapd...NOT FOUND<br>    zimbra-patch...FOUND zimbra-patch-8.8.12.1568982480<br>    zimbra-mta-patch...FOUND zimbra-mta-patch-8.8.12.1552427139<br>    zimbra-proxy-patch...FOUND zimbra-proxy-patch-8.8.12.1554984827<br>    zimbra-license-tools...NOT FOUND<br>    zimbra-license-extension...NOT FOUND<br>    zimbra-network-store...NOT FOUND<br>    zimbra-network-modules-ng...NOT FOUND<br>    zimbra-chat...FOUND zimbra-chat-2.0.3.1559648872-1<br>    zimbra-talk...NOT FOUND<br>    zimbra-ldap...FOUND zimbra-ldap-8.8.12_GA_3794<br>    zimbra-logger...FOUND zimbra-logger-8.8.12_GA_3794<br>    zimbra-mta...FOUND zimbra-mta-8.8.12_GA_3794<br>    zimbra-dnscache...FOUND zimbra-dnscache-8.8.12_GA_3794<br>    zimbra-snmp...FOUND zimbra-snmp-8.8.12_GA_3794<br>    zimbra-store...FOUND zimbra-store-8.8.12_GA_3794<br>    zimbra-apache...FOUND zimbra-apache-8.8.12_GA_3794<br>    zimbra-spell...FOUND zimbra-spell-8.8.12_GA_3794<br>    zimbra-convertd...NOT FOUND<br>    zimbra-memcached...FOUND zimbra-memcached-1.4.37-2<br>    zimbra-proxy...FOUND zimbra-proxy-8.8.12_GA_3794<br>    zimbra-archiving...NOT FOUND<br>    zimbra-core...FOUND zimbra-core-8.8.12_GA_3794<br>ZCS upgrade from 8.8.12 to 8.8.12 will be performed.<br>Validating ldap configuration<br>LDAP validation succeeded.  Continuing.<br><br><br>----------------------------------------------------------------------<br>PLEASE READ THIS AGREEMENT CAREFULLY BEFORE USING THE SOFTWARE.<br>SYNACOR, INC. (<span class="hljs-string">&quot;SYNACOR&quot;</span>) WILL ONLY LICENSE THIS SOFTWARE TO YOU IF YOU<br>FIRST ACCEPT THE TERMS OF THIS AGREEMENT. BY DOWNLOADING OR INSTALLING<br>THE SOFTWARE, OR USING THE PRODUCT, YOU ARE CONSENTING TO BE BOUND BY<br>THIS AGREEMENT. IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS<br>AGREEMENT, THEN DO NOT DOWNLOAD, INSTALL OR USE THE PRODUCT.<br><br>License Terms <span class="hljs-keyword">for</span> this Zimbra Collaboration Suite Software:<br>https://www.zimbra.com/license/zimbra-public-eula-2-6.html<br>----------------------------------------------------------------------<br><br><br><br>Do you agree with the terms of the software license agreement? [N] <br></code></pre></td></tr></table></figure>
+
+<p>如以上，一个已经安装过的zaibra，再次执行安装程序的提示，如已经安装过的组件，提示FOUND，未安装的组件，提示NOT FOUND。在我自己的配置中，zimbra drive这个测试安装后，页面上open drive页面也打不开。所以正式安装的时候，就没有安装这个组件了，除这个外的其它组件都默认安装。</p>
+<p>同意license后，即配置zimbra的源，以及安装程序自动执行配置源，用户，下载组件，安装的过程。在此过程中，还涉及配置域名的配置，大概如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">DNS ERROR resolving MX <span class="hljs-keyword">for</span> mail.ywmy.xyz<br>It is suggested that the domain name have an MX record configured <span class="hljs-keyword">in</span> DNS<br>Change domain name? [Yes]<br>Create domain: [mail.ywmy.xyz] ywmy.xyz<br>        MX: mail.ywmy.xyz<br><br>        Interface: 192.168.10.71<br>        Interface: ::1<br><br><span class="hljs-keyword">done</span>.<br>Checking <span class="hljs-keyword">for</span> port conflicts<br></code></pre></td></tr></table></figure>
+
+<p>配置完成，完生成安装及组件配置信息。大概如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs bash">Main menu<br><br>   1) Common Configuration:<br>   2) zimbra-ldap:                             Enabled<br>   3) zimbra-logger:                           Enabled<br>   4) zimbra-mta:                              Enabled<br>   5) zimbra-dnscache:                         Enabled<br>   6) zimbra-snmp:                             Enabled<br>   7) zimbra-store:                            Enabled<br>        +Create Admin User:                    <span class="hljs-built_in">yes</span><br>        +Admin user to create:                 admin@ywmy.xyz<br>******* +Admin Password                        UNSET<br>        +Anti-virus quarantine user:           virus-quarantine.rvwrscjel4@ywmy.xyz<br>        +Enable automated spam training:       <span class="hljs-built_in">yes</span><br>        +Spam training user:                   spam.i6zgq_xfb@ywmy.xyz<br>        +Non-spam(Ham) training user:          ham.kctdkkb_i@ywmy.xyz<br>        +SMTP host:                            mail.ywmy.xyz<br>        +Web server HTTP port:                 8080<br>        +Web server HTTPS port:                8443<br>        +Web server mode:                      https<br>        +IMAP server port:                     7143<br>        +IMAP server SSL port:                 7993<br>        +POP server port:                      7110<br>        +POP server SSL port:                  7995<br>        +Use spell check server:               <span class="hljs-built_in">yes</span><br>        +Spell server URL:                     https://mail.ywmy.xyz:7780/<br>        +Enable version update checks:         TRUE<br>        +Enable version update notifications:  TRUE<br>        +Version update notification email:    admin@ywmy.xyz<br>        +Version update <span class="hljs-built_in">source</span> email:          admin@ywmy.xyz<br>        +Install mailstore (service webapp):   <span class="hljs-built_in">yes</span><br>        +Install UI (zimbra,zimbraAdmin webapps): <span class="hljs-built_in">yes</span><br><br>   8) zimbra-spell:                            Enabled<br>   9) zimbra-proxy:                            Enabled<br>  10) zimbra-imapd:                            Enabled<br>  11) Default Class of Service Configuration:<br>   s) Save config to file<br>   x) Expand menu<br>   q) Quit<br><br>Address unconfigured (**) items  (? - <span class="hljs-built_in">help</span>) 7<br></code></pre></td></tr></table></figure>
+
+<p>如上，配置默认未设置admin的登录密码。选7后选4，设置admin密码，后按r返回上级菜单，最后按a确认配置，zimbra系统即可配置各组件的各配置项，大概如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">Main menu<br><br>   1) Common Configuration:<br>   2) zimbra-ldap:                             Enabled<br>   3) zimbra-logger:                           Enabled<br>   4) zimbra-mta:                              Enabled<br>   5) zimbra-dnscache:                         Enabled<br>   6) zimbra-snmp:                             Enabled<br>   7) zimbra-store:                            Enabled<br>   8) zimbra-spell:                            Enabled<br>   9) zimbra-proxy:                            Enabled<br>  10) zimbra-imapd:                            Enabled<br>  11) Default Class of Service Configuration:<br>   s) Save config to file<br>   x) Expand menu<br>   q) Quit<br><br>*** CONFIGURATION COMPLETE - press <span class="hljs-string">&#x27;a&#x27;</span> to apply<br>Select from menu, or press <span class="hljs-string">&#x27;a&#x27;</span> to apply config (? - <span class="hljs-built_in">help</span>) a<br></code></pre></td></tr></table></figure>
+
+<p>完成自动配置后，即开始自动安装，大概如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">Notify Zimbra of your installation? [Yes]<br>Notifying Zimbra of installation via http://www.zimbra.com/cgi-bin/notify.cgi?VER=8.8.15_GA_3869_RHEL7_64&amp;MAIL=admin@freedom.local<br><br>Notification complete<br><br>Checking <span class="hljs-keyword">if</span> the NG started running...done.<br>Setting up zimbra crontab...done.<br><br><br>Moving /tmp/zmsetup.20191230-135538.<span class="hljs-built_in">log</span> to /opt/zimbra/log<br><br><br>Configuration complete - press <span class="hljs-built_in">return</span> to <span class="hljs-built_in">exit</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="查看zimbra服务状态"><a href="#查看zimbra服务状态" class="headerlink" title="查看zimbra服务状态"></a>查看zimbra服务状态</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs bash">su - zimbra<br>[zimbra@mail root]$ zmcontrol status <br>Host mail.ywmy.xyz<br>	amavis                  Running<br>	antispam                Running<br>	antivirus               Running<br>	dnscache                Running<br>	ldap                    Running<br>	logger                  Running<br>	mailbox                 Running<br>	memcached               Running<br>	mta                     Running<br>	opendkim                Running<br>	proxy                   Running<br>	service webapp          Running<br>	snmp                    Running<br>	spell                   Running<br>	stats                   Running<br>	zimbra webapp           Running<br>	zimbraAdmin webapp      Running<br>	zimlet webapp           Running<br>	zmconfigd               Running<br><br><span class="hljs-comment"># 重启zimbra服务</span><br>[zimbra@mail root]$ zmcontrol restart<br></code></pre></td></tr></table></figure>
+
+<p>以上，zimbra服务已经完成安装。接下来，需要涉及到的就是zimbra各程序端口放开，和映射操作。</p>
+<h3 id="防火墙、端口映射及登录测试"><a href="#防火墙、端口映射及登录测试" class="headerlink" title="防火墙、端口映射及登录测试"></a>防火墙、端口映射及登录测试</h3><h4 id="防火墙配置"><a href="#防火墙配置" class="headerlink" title="防火墙配置"></a>防火墙配置</h4><p>参考前面zimbra服务安装时配置的各个端口，在centos中的firewalld放通对应的端口；</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">firewall-cmd --permanent --add-port=&#123;25,80,110,143,443,465,587,993,995,5222,5223,9071,7071,7025&#125;/tcp<br><span class="hljs-comment"># 另一个添加服务器的方法，建议使用下面的配置方法</span><br>firewall-cmd --permanent --add-service=&#123;pop3,pop3s,imap,imaps,smtp,smtps，https&#125;<br>firewall-cmd --complete-reload<br></code></pre></td></tr></table></figure>
+<p>对应的。出口设备如防火墙，或路由器上，需要配置上面相对应的端口。</p>
+<h4 id="登录测试"><a href="#登录测试" class="headerlink" title="登录测试"></a>登录测试</h4><p>内网打开邮件服务器的登录页面：</p>
+<p>如本次部署：<a target="_blank" rel="noopener" href="https://192.168.10.71/">https://192.168.10.71</a></p>
+<p><img src="https://blog.ywmy.xyz/linux/zimbra-login_page.png" srcset="/img/loading.gif" lazyload alt="zimbra-login_page"></p>
+<p>这里使用前面安装配置中设置的登录信息登陆即可。</p>
+<p><img src="https://blog.ywmy.xyz/linux/zimbra-login_page_admin.png" srcset="/img/loading.gif" lazyload alt="zimbra-login_page_admin"></p>
+<p>管理员登录界面，默认的管理员端口可以查看前面安装过程中的配置回显信息，默认的管理员端口为7071，如本次部署参考：<a target="_blank" rel="noopener" href="https://192.168.10.71:7071/">https://192.168.10.71:7071</a></p>
+<p><img src="https://blog.ywmy.xyz/linux/zimbra-admin_console_login.png" srcset="/img/loading.gif" lazyload alt="zimbra-admin_console_login"></p>
+<p>对应的，映射到公网IP后，可以把内网IP替换成公网IP后，打开登录页面即可。</p>
+<h3 id="DNS、A记录、MX记录配置"><a href="#DNS、A记录、MX记录配置" class="headerlink" title="DNS、A记录、MX记录配置"></a>DNS、A记录、MX记录配置</h3><p>zimbra服务程序，依赖DNS服务。需要在部署的zimbra服务器上部署本地的DNS服务。对于域名和MX记录配置，需要在域名供应商的解析中添加对应的记录。本部署实例在阿里云上配置参考。</p>
+<h4 id="DNS配置"><a href="#DNS配置" class="headerlink" title="DNS配置"></a>DNS配置</h4><p>centos 配置DNS，需要下载和安装bind。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install <span class="hljs-built_in">bind</span> bind-utils<br></code></pre></td></tr></table></figure>
+
+<p>配置named服务。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/named.conf<br><br>[root@mail ~]<span class="hljs-comment"># cat /etc/named.conf</span><br>//<br>// named.conf<br>//<br>// Provided by Red Hat <span class="hljs-built_in">bind</span> package to configure the ISC BIND named(8) DNS<br>// server as a caching only nameserver (as a localhost DNS resolver only).<br>//<br>// See /usr/share/doc/bind*/sample/ <span class="hljs-keyword">for</span> example named configuration files.<br>//<br>// See the BIND Administrator<span class="hljs-string">&#x27;s Reference Manual (ARM) for details about the</span><br><span class="hljs-string">// configuration located in /usr/share/doc/bind-&#123;version&#125;/Bv9ARM.html</span><br><span class="hljs-string"></span><br><span class="hljs-string">options &#123;</span><br><span class="hljs-string">	listen-on port 53 &#123; 127.0.0.1; 192.168.10.71; &#125;;</span><br><span class="hljs-string">	listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="hljs-string">	directory 	&quot;/var/named&quot;;</span><br><span class="hljs-string">	dump-file 	&quot;/var/named/data/cache_dump.db&quot;;</span><br><span class="hljs-string">	statistics-file &quot;/var/named/data/named_stats.txt&quot;;</span><br><span class="hljs-string">	memstatistics-file &quot;/var/named/data/named_mem_stats.txt&quot;;</span><br><span class="hljs-string">	recursing-file  &quot;/var/named/data/named.recursing&quot;;</span><br><span class="hljs-string">	secroots-file   &quot;/var/named/data/named.secroots&quot;;</span><br><span class="hljs-string">	allow-query     &#123; localhost; 192.168.10.71; &#125;;</span><br><span class="hljs-string"></span><br><span class="hljs-string">	/* </span><br><span class="hljs-string">	 - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.</span><br><span class="hljs-string">	 - If you are building a RECURSIVE (caching) DNS server, you need to enable </span><br><span class="hljs-string">	   recursion. </span><br><span class="hljs-string">	 - If your recursive DNS server has a public IP address, you MUST enable access </span><br><span class="hljs-string">	   control to limit queries to your legitimate users. Failing to do so will</span><br><span class="hljs-string">	   cause your server to become part of large scale DNS amplification </span><br><span class="hljs-string">	   attacks. Implementing BCP38 within your network would greatly</span><br><span class="hljs-string">	   reduce such attack surface </span><br><span class="hljs-string">	*/</span><br><span class="hljs-string">	recursion yes;</span><br><span class="hljs-string"></span><br><span class="hljs-string">	dnssec-enable yes;</span><br><span class="hljs-string">	dnssec-validation yes;</span><br><span class="hljs-string"></span><br><span class="hljs-string">	/* Path to ISC DLV key */</span><br><span class="hljs-string">	bindkeys-file &quot;/etc/named.root.key&quot;;</span><br><span class="hljs-string"></span><br><span class="hljs-string">	managed-keys-directory &quot;/var/named/dynamic&quot;;</span><br><span class="hljs-string"></span><br><span class="hljs-string">	pid-file &quot;/run/named/named.pid&quot;;</span><br><span class="hljs-string">	session-keyfile &quot;/run/named/session.key&quot;;</span><br><span class="hljs-string">&#125;;</span><br><span class="hljs-string"></span><br><span class="hljs-string">logging &#123;</span><br><span class="hljs-string">        channel default_debug &#123;</span><br><span class="hljs-string">                file &quot;data/named.run&quot;;</span><br><span class="hljs-string">                severity dynamic;</span><br><span class="hljs-string">        &#125;;</span><br><span class="hljs-string">&#125;;</span><br><span class="hljs-string"></span><br><span class="hljs-string">zone &quot;.&quot; IN &#123;</span><br><span class="hljs-string">	type hint;</span><br><span class="hljs-string">	file &quot;named.ca&quot;;</span><br><span class="hljs-string">&#125;;</span><br><span class="hljs-string"></span><br><span class="hljs-string">include &quot;/etc/named.rfc1912.zones&quot;;</span><br><span class="hljs-string">include &quot;/etc/named.root.key&quot;;</span><br><span class="hljs-string"></span><br><span class="hljs-string"># 需要添加的zone配置</span><br><span class="hljs-string"></span><br><span class="hljs-string">zone &quot;ywmy.xyz&quot; &#123;</span><br><span class="hljs-string">	type master;</span><br><span class="hljs-string">	file &quot;ywmy.xyz.zone&quot;;</span><br><span class="hljs-string">&#125;;</span><br></code></pre></td></tr></table></figure>
+
+<p>以上的配置在安装bind程序的时候自动生成。需要关注的配置见下：</p>
+<div class="note note-info">
+            <ul><li>listen-on port 53 { 127.0.0.1; 192.168.10.71; };  # 添加zimbra服务器的IP</li><li>allow-query     { localhost; 192.168.10.71; };</li><li>添加zone配置，上面配置中注释下面的内容</li></ul>
+          </div>
+
+<p>最后，创建域名的zone文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /var/named/<br>vim ywmy.xyz.zone<br><span class="hljs-comment"># 配置信息如下：</span><br>[root@mail named]<span class="hljs-comment"># cat ywmy.xyz.zone </span><br>;<br>; BIND data file <span class="hljs-keyword">for</span> <span class="hljs-built_in">local</span> loopback interface<br>;<br><span class="hljs-variable">$TTL</span>    86400<br>@       IN      SOA     ns1.ywmy.xyz. root.ywmy.xyz. (<br>        2021051001 ; Serial<br>        604800    ; Refresh<br>        86400     ; Retry<br>        2419200   ; Expire<br>        604800 )  ; Negative Cache TTL<br><br>;<br>; name servers - NS records<br><br>@       IN      NS      ns1.ywmy.xyz.<br>@               MX    10   mail.ywmy.xyz.<br><br>; name servers - A records<br><br>ns1    IN    A    192.168.10.71<br>mail    IN    A    192.168.10.71<br></code></pre></td></tr></table></figure>
+
+<h4 id="启动本地DNS服务"><a href="#启动本地DNS服务" class="headerlink" title="启动本地DNS服务"></a>启动本地DNS服务</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl start named<br>systemctl <span class="hljs-built_in">enable</span> named<br></code></pre></td></tr></table></figure>
+
+<h4 id="域名配置"><a href="#域名配置" class="headerlink" title="域名配置"></a>域名配置</h4><p>登录域名供应商后台，本实例域名为阿里云。登录阿里云，配置和邮件相关的A记录，和MX记录。</p>
+<table>
+<thead>
+<tr>
+<th align="left">主机记录</th>
+<th align="left">记录类型</th>
+<th align="left">记录值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">mail</td>
+<td align="left">A</td>
+<td align="left">邮件服务器的公网IP（1.2.3.4）</td>
+</tr>
+<tr>
+<td align="left">@</td>
+<td align="left">MX</td>
+<td align="left">mail.ywmy.xyz 10</td>
+</tr>
+</tbody></table>
+<p>配置了这里，就可以使用域名来访问已经部署的服务了。</p>
+<h3 id="配置zimbra发信"><a href="#配置zimbra发信" class="headerlink" title="配置zimbra发信"></a>配置zimbra发信</h3><h4 id="处理发信问题"><a href="#处理发信问题" class="headerlink" title="处理发信问题"></a>处理发信问题</h4><p>创建邮箱的用户名，会发现，邮箱里的talk服务可以正常使用，不过，站内发送邮件，是没办法接收的，后台一直有队列。</p>
+<p>队列的提示大致如下：</p>
+<div class="note note-info">
+            <p>delivery temporarily suspended: connect to example.com[192.168.10.71]:7025: Connection refused</p>
+          </div>
+
+<p>解决办法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">zmprov ms mail.ywmy.xyz zimbraMtaLmtpHostLookup native  <span class="hljs-comment"># 中间域名那段，改成自己部署zimbra服务的主机名即可。</span><br>zmprov mcf zimbraMtaLmtpHostLookup native   <span class="hljs-comment"># 如果使用的是Single Server，则还要始终注意Global Config</span><br>zmmtactl restart<br></code></pre></td></tr></table></figure>
+
+<p>完成以上配置，则可以正常发信了。</p>
+<div class="note note-warnning">
+            <p>到这一步，域名访问，站内邮件发送，talk的服务已经都可以正常使用了，不过，尝试往第三方邮件发送邮件，发现会被退信。这个和邮件服务商的反垃圾联盟可能有关。还需要在域名供应商的DNS解析记录中配置SFP相关的txt记录。</p>
+          </div>
+
+<p>接下来就是和DKIM相关的配置。</p>
+<h3 id="DKIM，SFP，DMIRC设定"><a href="#DKIM，SFP，DMIRC设定" class="headerlink" title="DKIM，SFP，DMIRC设定"></a>DKIM，SFP，DMIRC设定</h3><p>在这一步，我们需要把zimbra生成的DKIM Public signature信息，添加到域名的txt记录中。txt记录通常做SFP，用于反垃圾邮件。</p>
+<h4 id="设置DKIM"><a href="#设置DKIM" class="headerlink" title="设置DKIM"></a>设置DKIM</h4><p>这个需要通过命令行工具操作。登录服务器后，切换成zimbra账户来设置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs bash">su - zimbra<br><span class="hljs-built_in">cd</span> libexec/     <span class="hljs-comment"># 绝对路径 /opt/zimbra/libexec/</span><br><span class="hljs-comment"># 查看zmdkimkeyutil有哪些相关的指令</span><br>./zmdkimkeyutil -?<br><span class="hljs-comment"># 回显如下：</span><br>[zimbra@mail libexec]$ ./zmdkimkeyutil ?<br>Usage: ./zmdkimkeyutil [-a [-b]] [-q] [-r] [-s selector] [-S] [-u [-b]] [-d domain]<br>-a: Add new key pair and selector <span class="hljs-keyword">for</span> domain<br>-b: Optional parameter specifying the number of bits <span class="hljs-keyword">for</span> the new key.<br>    Only works with -a and -u.  Default when not specified is 2048 bits.<br>-d domain: Domain to use<br>-h: Show this usage block<br>-q: Query DKIM information <span class="hljs-keyword">for</span> domain<br>-r: Remove DKIM keys <span class="hljs-keyword">for</span> domain<br>-s: Use custom selector string instead of random UUID<br>-S: Generate keys with subdomain data.  This must be used <span class="hljs-keyword">if</span> you want to sign both example.com and sub.example.com separately.<br>    Only works with -a and -u.  Default is not to <span class="hljs-built_in">set</span> this flag.<br>-u: Update keys <span class="hljs-keyword">for</span> domain<br>One of [a, q, r, or u] must be supplied<br>For -q, search can be either by selector or domain<br>For all other usage patterns, domain is required<br></code></pre></td></tr></table></figure>
+
+<p>大概说明：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">-a：为域添加新的密钥对和选择器<br>-b：可选参考，指定新的密钥位数。<br>    仅与-a和-u一起使用。未指定时默认为2048位。<br>-d：使用域名<br>-h：显示使用块<br>-q：查询域的DKIM信息<br>-r：删除域的DKIM密钥<br>-s：使用自定义选择器字条器代替随机UUID<br>-S：生成带有子域数据的密钥。如果要分别对example.com和sub.example.com进行签名，则必须使用此选项。<br>-u：更新新密钥<br>必须提供[a,q,r或u]中的一种<br>对于-q，可以按选择器或域进行搜索<br>对于所有的其它使用模式，必须使用域<br></code></pre></td></tr></table></figure>
+
+<p>运行zmdkimkeyutil</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 生成：</span><br>./zmdkimkeyutil -a -d ywmy.xyz -s ywmydkim<br><span class="hljs-comment"># 查看：</span><br>[zimbra@mail libexec]$ ./zmdkimkeyutil -q -d ywmy.xyz<br>DKIM Domain:<br>ywmy.xyz<br><br>DKIM Selector:<br>9149A4A6-6A3F-11ED-ADC9-44E3D876BA8B<br><br>DKIM Private Key:<br>-----BEGIN RSA PRIVATE KEY-----<br>MI..............................................................<br><span class="hljs-comment">#</span><br><span class="hljs-comment">#       中间很多字符串</span><br><span class="hljs-comment">#</span><br>...................................................T8A==<br>-----END RSA PRIVATE KEY-----<br><br>DKIM Public signature:<br>9149A4A6-6A3F-11ED-ADC9-44E3D876BA8B._domainkey	IN	TXT	( <span class="hljs-string">&quot;v=DKIM1; k=rsa; &quot;</span><br>	  <span class="hljs-string">&quot;p=MIIB.............................lots of characters.................................................................................Vhi8p1dwBWWvkDcp&quot;</span><br>	  <span class="hljs-string">&quot;S1.....................................lots of characters...........................QAB&quot;</span> )  ; ----- DKIM key 9149A4A6-6A3F-11ED-ADC9-44E3D876BA8B <span class="hljs-keyword">for</span> ywmy.xyz<br><br>DKIM Identity:<br>ywmy.xyz<br><span class="hljs-comment"># 更新：</span><br>./zmdkimkeyutil -u -d ywmy.xyz<br></code></pre></td></tr></table></figure>
+
+<p>配置完了，接下来，可以把上面生成的DKIM Public singature信息配置到域名的dns解析中了。</p>
+<div class="note note-warnning">
+            <p>配置的部分为从 v&#x3D;DKIM1;到后面的信息，不能有空格，也不能有“号。</p>
+          </div>
+
+<p>参考示例：<br><img src="https://blog.ywmy.xyz/linux/DKIM%20Public%20singature.png" srcset="/img/loading.gif" lazyload alt="DKIM_Public_signature"></p>
+<p>好了。到此，反垃圾邮件配置，对其它邮件服务商发信被拒收的问题就解决了。</p>
+<p>可以做一个发信测试，比如QQ邮件(foxmail)，再回信测试。验证如下：</p>
+<p><img src="https://blog.ywmy.xyz/linux/send%20mail%20test%20ok.png" srcset="/img/loading.gif" lazyload alt="send mail test ok"></p>
+<p>至此，zimbra邮件部署完毕，其实，也还缺少一个https证书的问题，zimbra默认自签https证书，虽然能保证传输的可靠性，但解决不了浏览器证书信任问题。这个留待后面更新zimbra服务导入阿里云证书时验证处理。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/security/">#security</a>
+      
+        <a href="/tags/zimbra-mail/">#zimbra mail</a>
+      
+        <a href="/tags/mail/">#mail</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>centos 搭建zimbra企业邮箱</div>
+      <div>https://ywmy.xyz/2022/11/21/centos-搭建zimbra企业邮箱/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年11月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/11/24/centos-7-%E5%9F%BA%E7%A1%80%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="centos 7 基础环境搭建">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">centos 7 基础环境搭建</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/16/zabbix-%E9%85%8D%E7%BD%AE%E9%82%AE%E4%BB%B6%E5%91%8A%E8%AD%A6/" title="zabbix 配置邮件告警">
+                        <span class="hidden-mobile">zabbix 配置邮件告警</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

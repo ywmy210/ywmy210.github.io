@@ -1,0 +1,772 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="linux 之软件防火墙iptables详解netfilter是由rusth russell提出的linux 2.4内核防火墙框架，该框架既简洁又灵活，可实现安全策略应用中的许多功能，如数据包过滤、数据包处理、地址伪装、透明代理、动态网络地址转换（network address translation, nat）,以及基于用户及媒体访问控制（media access control, mac）地址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iptables详解">
+<meta property="og:url" content="https://ywmy.xyz/2018/08/22/iptables%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="linux 之软件防火墙iptables详解netfilter是由rusth russell提出的linux 2.4内核防火墙框架，该框架既简洁又灵活，可实现安全策略应用中的许多功能，如数据包过滤、数据包处理、地址伪装、透明代理、动态网络地址转换（network address translation, nat）,以及基于用户及媒体访问控制（media access control, mac）地址">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2018-08-22T14:14:44.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.745Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="firewall">
+<meta property="article:tag" content="iptables">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>iptables详解 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="iptables详解"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2018-08-22 22:14" pubdate>
+          2018年8月22日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          25 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">iptables详解</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="linux-之软件防火墙iptables详解"><a href="#linux-之软件防火墙iptables详解" class="headerlink" title="linux 之软件防火墙iptables详解"></a>linux 之软件防火墙iptables详解</h1><p>netfilter是由rusth russell提出的linux 2.4内核防火墙框架，该框架既简洁又灵活，可实现安全策略应用中的许多功能，如数据包过滤、数据包处理、地址伪装、透明代理、动态网络地址转换（network address translation, nat）,以及基于用户及媒体访问控制（media access control, mac）地址的过滤和基于状态的过滤、包速率限制等。iptables&#x2F;netfilter的这些规则可以通过灵活组合，形成非常多的功能、涵盖各个方面，这一切都利益于它的优秀设计思想。</p>
+<span id="more"></span>
+
+<h2 id="0x01：filter和iptables"><a href="#0x01：filter和iptables" class="headerlink" title="0x01：filter和iptables"></a>0x01：filter和iptables</h2><p>netfilter是linux操作系统核心层内部的一个数据包处理模块，它具有如下功能：</p>
+<ul>
+<li>网络地址转换（network address translation）</li>
+<li>数据包内容修改</li>
+<li>以及数据包过滤的防火墙功能</li>
+</ul>
+<p>netfilter平台中制定了数据包的五个挂载点（hook poing，我们可以理解为回调函数点，数据包到达这些位置的时候会主动调用我们的boov，使我们有机会能在数据包路由的时候改变它们的方向、内容），这５个挂载点分别是pre_routing、input、output、forward、post_routing。</p>
+<p>netfilter所设置的规则是存放在内核内存中的，而iptables是一个应用层的应用程序，它通过netfilter放出的接口来对存放在内核中的xxtables（netfilter的配置表）进行修改。这个xxtables由表tables、链chains、规则rules组成，iptables在应用层负责修改这个规则文件。类似应用程序还有firewall、ufw。</p>
+<p><img src="http://blog.ywmy.xyz/ywmy/linuxiptables_and_kernel.png" srcset="/img/loading.gif" lazyload alt="iptables与内核"></p>
+<h3 id="1-1-filter、nat、mangle-raw规则表"><a href="#1-1-filter、nat、mangle-raw规则表" class="headerlink" title="1.1:filter、nat、mangle raw规则表"></a>1.1:filter、nat、mangle raw规则表</h3><h4 id="filter表"><a href="#filter表" class="headerlink" title="filter表"></a>filter表</h4><p>主要用于对数据包进行过滤，根据具体的规则决定是否放行该数据包（如drop、accept、reject、log）。filter表对应的内核模块为iptable_filter，包含三个规则链：</p>
+<ul>
+<li>input链：input针对那些目的地是本地的包</li>
+<li>forward链：forward过滤所胡不是本地产生的并且旷日持久地不是本地（即本机只负责转发）的包</li>
+<li>output链：output是用来过滤所有本地生成的包</li>
+</ul>
+<h4 id="nat表"><a href="#nat表" class="headerlink" title="nat表"></a>nat表</h4><p>主要用于修改数据包的ip地址、端口等信息（网络地址转换、如snat、dnat、masquerade、redirect）。属于一个流的包（因为包的大小限制导致数据可能会被分成多个数据包）只会经过这个表一次。如果第一个包被允许做nat或masqueraded，那个余下的包都会自动地被做相同的操作，也就是说，余下的包不会再通过这个表。表对应的内核模块为iptable_nat，包含三个链：</p>
+<ul>
+<li>prerouting链：作用是在包刚刚到达防火墙时改变它的目的地址</li>
+<li>output链：改变本地产生的包的目的地址</li>
+<li>postrouting链：在包就要离开防火墙之前改变其源地址</li>
+</ul>
+<h4 id="mangle表"><a href="#mangle表" class="headerlink" title="mangle表"></a>mangle表</h4><p>主要用于修改数据包的tos（type oof service，服务类型）、ttl（time to live，生存周期）值以及为数据包设置mark标记，以实现qos（quality of service，服务质量）调整以及策略路由等应用，由于需要相应的路由设备支持，因此应用并不广泛。包含一个规则链－－prerouting、postrouting、input、output、forward。</p>
+<h4 id="raw表"><a href="#raw表" class="headerlink" title="raw表"></a>raw表</h4><p>是自1.2.9以后版本的iptables新增的表，主要用决定数据包是否被状态跟踪机制处理。在匹配数据包时，raw表的规则要优先于其它表。包含两条规则链－－output、prerouting</p>
+<p>iptables中数据包和４种被跟踪连接的４种不同状态：</p>
+<ul>
+<li>new：该包想要形如一个连接（重新连接或将连接重定向）</li>
+<li>related：该包是属于某个已经建立的连接所建立的新连接。例如：ftp的数据传输连接就是控制连接　所related出来的连接。–icmp-type 0（ping 应答）就是icmp-type 8（ping 请求）所　related出来的。</li>
+<li>established：只要发送并接到应用，一个数据连接从new变为established，而且该状态会纠结匹配这个连接的后续数据包。</li>
+<li>invalid：数据包不能被识别属于哪个连接或没有任何状态。比如内存举出，收到不知属于哪个连接的icmp错误信息，一般应该drop这个状态的任何数据。</li>
+</ul>
+<h3 id="1-2-input、forward等规则链和规则"><a href="#1-2-input、forward等规则链和规则" class="headerlink" title="1.2:input、forward等规则链和规则"></a>1.2:input、forward等规则链和规则</h3><p>在处理各种数据包时，根据防火墙规则的不同介入时机，iptables代涉及５种默认规则链，从应用时间点的角度理解这些链：</p>
+<ul>
+<li>input链：当接收到防火墙本地地址的数据包（入站）时，应用此链中的规则。</li>
+<li>output链：当防火墙本机向外发送数据包（出站）时，应用此链中的规则。</li>
+<li>forward链：当接收到需要通过防火墙发送给其它地址的数据包（转发）时，应用此链中的规则。</li>
+<li>prerouting链：在对数据包作路由选择之前，应用此链中的规则，如dnat。</li>
+<li>postrouting链：在对数据包作路由选择之后，应用此链中的规则，如snat。</li>
+</ul>
+<p>防火墙处理数据包的方式（规则）：</p>
+<ul>
+<li><p>accept：允许数据包通过。</p>
+</li>
+<li><p>drop：直接丢弃数据包，不给任何回应信息。</p>
+</li>
+<li><p>reject：拒绝数据包通过，必要时会给数据发送端一个响应信息。</p>
+</li>
+<li><p>snat：源地址转换在进入路由层面的route之前，重新改写一个源地址，目标地址不变，并在本机建立nat表项，当数据返回时，根据nat表将目的地址数据改定为数据发送出去时候的源地址，并发送给主机。解决内网用户用同一个公网地址上网的问题。</p>
+</li>
+<li><p>dnat：目标地址转换。和snat相反，ip包经过route之后、出本地的网络栈之前，重新修改目标地址，源地址不变，在本机建立nat表项，当数据返回时，根据nat表将源地址修改为熂发送过来的时候的目标地址，并发给远程主机。可以隐藏后端服务器的真实地址。</p>
+<p>  redirect:是dnat的一种特殊形式，将网络包转发到本地host上（不管ip头部指定的目标地址是什么），方便在本机做端口转发。</p>
+</li>
+<li><p>log：在&#x2F;var&#x2F;log&#x2F;messages文件中记录日志信息，然后将数据包传递给下一个规则。</p>
+</li>
+</ul>
+<h2 id="0x02：linux数据包路由原理"><a href="#0x02：linux数据包路由原理" class="headerlink" title="0x02：linux数据包路由原理"></a>0x02：linux数据包路由原理</h2><p>我们已经知道了netfilter和iptables的架构和作用，并且学习了控制netfilter行为和xtables表的结构，那么这个xtables表是怎么在内核协议栈的数据包路由中直作用的呢？</p>
+<p>风口数据包由底层的网卡nic（network interface card）接收，通过数据链路层的解包之后（去除数据链路帧头），就进入了tcp&#x2F;ip协议栈（本质就是一个处理网络数据的内核驱动）和netfilter混合的数据处理流程中了。数据包的接收、处理、转发流程构成了一个有限状态微量机，经过一些列的内核处理函数、以及netfilter hook点，最后被转发、或者本次上层的应用程序消化掉。是时候看这张图了</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/firewall/">#firewall</a>
+      
+        <a href="/tags/iptables/">#iptables</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>iptables详解</div>
+      <div>https://ywmy.xyz/2018/08/22/iptables详解/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2018年8月22日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/10/13/ubuntu-18-04%E5%AE%89%E8%A3%85phpvirtualbox/" title="ubuntu 18.04安装phpvirtualbox">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ubuntu 18.04安装phpvirtualbox</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/08/21/firewall-cmd/" title="firewall-cmd">
+                        <span class="hidden-mobile">firewall-cmd</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

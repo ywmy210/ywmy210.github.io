@@ -1,0 +1,777 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="CentOS 7编译安装 python3CentOS上自带了python2的环境，且yum依赖。想在CentOS上安装python3环境。还需要编译安装，且要解决环境冲突，python3的依赖。中间也遇到很多问题，比如编译报错，openssl相关的https问题。好在都已经解决，操作记录备忘。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 7编译安装python3">
+<meta property="og:url" content="https://ywmy.xyz/2022/05/06/CentOS-7%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85python3/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="CentOS 7编译安装 python3CentOS上自带了python2的环境，且yum依赖。想在CentOS上安装python3环境。还需要编译安装，且要解决环境冲突，python3的依赖。中间也遇到很多问题，比如编译报错，openssl相关的https问题。好在都已经解决，操作记录备忘。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2022-05-06T14:01:19.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.649Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="python 3">
+<meta property="article:tag" content="pip 3">
+<meta property="article:tag" content="gcc 7">
+<meta property="article:tag" content="openssl">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>CentOS 7编译安装python3 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CentOS 7编译安装python3"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-05-06 22:01" pubdate>
+          2022年5月6日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          38 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CentOS 7编译安装python3</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="CentOS-7编译安装-python3"><a href="#CentOS-7编译安装-python3" class="headerlink" title="CentOS 7编译安装 python3"></a>CentOS 7编译安装 python3</h1><p>CentOS上自带了python2的环境，且yum依赖。想在CentOS上安装python3环境。还需要编译安装，且要解决环境冲突，python3的依赖。中间也遇到很多问题，比如编译报错，openssl相关的https问题。好在都已经解决，操作记录备忘。</p>
+<span id="more"></span>
+
+<h2 id="更新centos，以及安装依赖"><a href="#更新centos，以及安装依赖" class="headerlink" title="更新centos，以及安装依赖"></a>更新centos，以及安装依赖</h2><p>编译安装python3所需要的依赖，可以参考以下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum check-update<br>yum update<br>yum install epel-release<br>yum groupinstall <span class="hljs-string">&#x27;Development Tools&#x27;</span><br>yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel db4-devel libpcap-devel xz-devel bzip2-devel libff-devel perl perl-devel perl-ExtUtils-Embed libxslt libxslt-devel libxml2-devel libxml2 gd gd-devel GeoIP GeoIP-devel<br><span class="hljs-comment"># 安装了以上依赖，可能还不够，可以安装openssl11,可能有用，实际后面我是通过编译安装openssl11，编译时指定openssl的路径后，才没有https报错的问题。</span><br>yum install openssl11 openssl11-devel openssl-libs<br></code></pre></td></tr></table></figure>
+
+<h2 id="更新GCC"><a href="#更新GCC" class="headerlink" title="更新GCC"></a>更新GCC</h2><p>编译中还遇到过编译报错的情况，尝试编译安装gcc升级后，python3编译没有报错了。操作如下：</p>
+<p><strong>1、安装scl源</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install centos-release-scl<br></code></pre></td></tr></table></figure>
+
+<p><strong>2、安装gcc，gcc++</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install devtoolset-7-gcc devtoolset-7-gcc-c++<br></code></pre></td></tr></table></figure>
+
+<p><strong>3、启动</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">sc <span class="hljs-built_in">enable</span> devtoolset bash<br></code></pre></td></tr></table></figure>
+
+<p>需要注意的是scl命令启用只是临时的，退出shell或重启就会恢复原系统的gcc版本。如果要长期使用gcc 7，可以添加环境变量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/profile.d/gcc.sh<br><br><span class="hljs-built_in">source</span> /opt/rh/devtoolset-7/enable<br></code></pre></td></tr></table></figure>
+<p>更新环境变量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">source</span> /etc/profile<br></code></pre></td></tr></table></figure>
+
+<p><strong>4、查看GCC版本</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># which gcc</span><br>/opt/rh/devtoolset-7/root/usr/bin/gcc<br><span class="hljs-comment"># gcc --version</span><br>gcc (GCC) 7.3.1 20180303 (Red Hat 7.3.1-5)<br>Copyright (C) 2017 Free Software Foundation, Inc.<br>This is free software; see the <span class="hljs-built_in">source</span> <span class="hljs-keyword">for</span> copying conditions.  There is NO<br>warranty; not even <span class="hljs-keyword">for</span> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<br></code></pre></td></tr></table></figure>
+<p>GCC更新完毕。</p>
+<h2 id="编译安装openssl-11"><a href="#编译安装openssl-11" class="headerlink" title="编译安装openssl 11"></a>编译安装openssl 11</h2><p>在前面的安装测试中，不管是编译参数加–with-ssl-default-suites&#x3D;openssl还是手动指定系统默认的openssl路径，安装完python3后，安装和更新python软件的时候，都会报错。</p>
+<blockquote>
+<p>WARNING: pip is configured with locations that require TLS&#x2F;SSL, however the ssl module in Python is not available. </p>
+</blockquote>
+<p>也手动改过&#x2F;root&#x2F;.config&#x2F;pip&#x2F;pip.conf配置文件:</p>
+<blockquote>
+<p>[golbal]<br>index-url &#x3D; <a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/pypi/simple/">https://mirrors.aliyun.com/pypi/simple/</a><br>将url的https请求改成http。这样是没有报错了，不过总感觉还是不解决实际问题。<br>于是，有了编译安装openssl的操作。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1、下载openssl 1.1.1</span><br>wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz<br><span class="hljs-comment"># 2、解压</span><br>tar -zxvf openssl-1.1.1l.tar.gz<br><span class="hljs-comment"># 3、编译安装</span><br><span class="hljs-built_in">cd</span> openssl-1.1.1l<br>./config --prefix=/opt/openssl<br>make<br>make install<br></code></pre></td></tr></table></figure>
+<p>openssl的源码包可以点<a target="_blank" rel="noopener" href="https://www.openssl.org/source/old/1.1.1/">这里</a>，openssl编译安装完成。</p>
+<h2 id="编译安装python3"><a href="#编译安装python3" class="headerlink" title="编译安装python3"></a>编译安装python3</h2><p>目前的版本是python3.10.4。直接从官网下载源码。编译参数，安装如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 1、下载python3源码</span><br>wget https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz<br><span class="hljs-comment"># 2、解压</span><br>tar -zxvf Python-3.10.4.tgz<br><span class="hljs-comment"># 3、编译参数，指定安装目录，指定openssl目录</span><br>./configure --prefix=/usr/local/python3 --with-openssl=/opt/openssl --enable-optimizations<br>mark<br>mark install<br><span class="hljs-comment"># 4、创建软链接</span><br><span class="hljs-built_in">ln</span> -s /usr/local/python3/bin/python3 /usr/local/bin/python3<br><span class="hljs-built_in">ln</span> -s /usr/local/python3/bin/pip3 /usr/local/bin/pip3<br></code></pre></td></tr></table></figure>
+<p>安装完毕，可以看一下python3的版本信息，我们来验证一下openssl是否正常。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># python3 -V</span><br>Python 3.10.4<br><span class="hljs-comment"># pip3 -V</span><br>pip 22.0.4 from /usr/local/python3/lib/python3.10/site-packages/pip (python 3.10)<br><span class="hljs-comment"># python3 -c &quot;import ssl;print(ssl.OPENSSL_VERSION)&quot;</span><br>OpenSSL 1.1.1k  FIPS 25 Mar 2021<br></code></pre></td></tr></table></figure>
+<p>好了，已经可以了。<br>openssl的版本已经正常出来了。</p>
+<h2 id="创建虚拟环境和包"><a href="#创建虚拟环境和包" class="headerlink" title="创建虚拟环境和包"></a>创建虚拟环境和包</h2><p>Python应用程序通常会使用不在标准库内的软件包和模块。应用程序有时需要特定版本的库，因为应用程序可能需要修复特定的错误，或者可以使用库的过时版本的接口编写应用程序。</p>
+<p>这意味着一个Python安装可能无法满足每个应用程序的要求。如果应用程序A需要特定模块的1.0版本但应用程序B需要2.0版本，则需求存在冲突，安装版本1.0或2.0将导致某一个应用程序无法运行。</p>
+<p>这个问题的解决方案是创建一个 virtual environment，一个目录树，其中安装有特定Python版本，以及许多其他包。</p>
+<p>然后，不同的应用将可以使用不同的虚拟环境。 要解决先前需求相冲突的例子，应用程序 A 可以拥有自己的 安装了 1.0 版本的虚拟环境，而应用程序 B 则拥有安装了 2.0 版本的另一个虚拟环境。 如果应用程序 B 要求将某个库升级到 3.0 版本，也不会影响应用程序 A 的环境。</p>
+<h3 id="创建虚拟环境"><a href="#创建虚拟环境" class="headerlink" title="创建虚拟环境"></a>创建虚拟环境</h3><p>用于创建和管理虚拟环境的模块称为 venv。venv 通常会安装你可用的最新版本的 Python。如果您的系统上有多个版本的 Python，您可以通过运行 python3 或您想要的任何版本来选择特定的Python版本。</p>
+<p>要创建虚拟环境，请确定要放置它的目录，并将 venv 模块作为脚本运行目录路径:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">python3 -m venv tutorial-env<br></code></pre></td></tr></table></figure>
+
+<p>这将创建 tutorial-env 目录，如果它不存在的话，并在其中创建包含 Python 解释器副本和各种支持文件的目录。</p>
+<p>虚拟环境的常用目录位置是 .venv。 这个名称通常会令该目录在你的终端中保持隐藏，从而避免需要对所在目录进行额外解释的一般名称。 它还能防止与某些工具所支持的 .env 环境变量定义文件发生冲突。</p>
+<p>创建虚拟环境后，您可以激活它。</p>
+<p>在Windows上，运行:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">tutorial-env\Scripts\activate.bat<br></code></pre></td></tr></table></figure>
+
+<p>在Unix或MacOS上，运行:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">source</span> tutorial-env/bin/activate<br></code></pre></td></tr></table></figure>
+
+<p>（这个脚本是为bash shell编写的。如果你使用 csh 或 fish shell，你应该改用 activate.csh 或 activate.fish 脚本。）</p>
+<p>激活虚拟环境将改变你所用终端的提示符，以显示你正在使用的虚拟环境，并修改环境以使 python 命令所运行的将是已安装的特定 Python 版本。 例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">Python 3.10.4 (main, May  6 2022, 16:35:03) [GCC 7.3.1 20180303 (Red Hat 7.3.1-5)] on linux<br>Type <span class="hljs-string">&quot;help&quot;</span>, <span class="hljs-string">&quot;copyright&quot;</span>, <span class="hljs-string">&quot;credits&quot;</span> or <span class="hljs-string">&quot;license&quot;</span> <span class="hljs-keyword">for</span> more information.<br>&gt;&gt;&gt; import sys<br>&gt;&gt;&gt; sys.path<br>[<span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;/opt/rh/devtoolset-7/root/usr/lib64/python2.7/site-packages&#x27;</span>, <span class="hljs-string">&#x27;/opt/rh/devtoolset-7/root/usr/lib/python2.7/site-packages&#x27;</span>, <span class="hljs-string">&#x27;/usr/local/python3/lib/python310.zip&#x27;</span>, <span class="hljs-string">&#x27;/usr/local/python3/lib/python3.10&#x27;</span>, <span class="hljs-string">&#x27;/usr/local/python3/lib/python3.10/lib-dynload&#x27;</span>, <span class="hljs-string">&#x27;/opt/for_jumpserver/lib/python3.10/site-packages&#x27;</span>]<br>&gt;&gt;&gt; <br></code></pre></td></tr></table></figure>
+<p>退出虚拟环境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># deactivate</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="配置源"><a href="#配置源" class="headerlink" title="配置源"></a>配置源</h3><p>更换默认源至阿里云镜像。</p>
+<p><strong>临时使用</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 虚拟环境中操作</span><br>pip install -i https://mirrors.aliyun.com/pypi/simple 包名<br></code></pre></td></tr></table></figure>
+
+<p><strong>长期使用</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip config <span class="hljs-built_in">set</span> global.index-rul https://mirrors.aliyun.com/pypi/simple/<br></code></pre></td></tr></table></figure>
+
+<p><strong>查看设置结果</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># pip config list</span><br>golbal.index-url https://mirrors.aliyun.com/pypi/simple/<br></code></pre></td></tr></table></figure>
+
+<p><strong>取消设置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">pip config <span class="hljs-built_in">unset</span> golbal.index-url <br></code></pre></td></tr></table></figure>
+
+<p>也可以修改~.config&#x2F;pip&#x2F;pip.conf配置文件修改python源。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/linux/">#linux</a>
+      
+        <a href="/tags/python-3/">#python 3</a>
+      
+        <a href="/tags/pip-3/">#pip 3</a>
+      
+        <a href="/tags/gcc-7/">#gcc 7</a>
+      
+        <a href="/tags/openssl/">#openssl</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CentOS 7编译安装python3</div>
+      <div>https://ywmy.xyz/2022/05/06/CentOS-7编译安装python3/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年5月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/05/07/Centos-7-yum%E5%AE%89%E8%A3%85Python3/" title="Centos 7 yum安装Python3">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Centos 7 yum安装Python3</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/03/%E9%85%8D%E7%BD%AEopenldap%E8%87%AA%E5%8A%A9%E4%BF%AE%E6%94%B9%E5%AF%86%E7%A0%81%E6%9C%8D%E5%8A%A1/" title="配置openldap自助修改密码服务">
+                        <span class="hidden-mobile">配置openldap自助修改密码服务</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

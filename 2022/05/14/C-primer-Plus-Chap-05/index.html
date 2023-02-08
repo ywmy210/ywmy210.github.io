@@ -1,0 +1,753 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="C primer Plus Chap 05C primer Plus 第五章代码与练习记录。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C primer Plus Chap 05">
+<meta property="og:url" content="https://ywmy.xyz/2022/05/14/C-primer-Plus-Chap-05/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="C primer Plus Chap 05C primer Plus 第五章代码与练习记录。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/code.jpg">
+<meta property="article:published_time" content="2022-05-14T02:26:36.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.693Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="c">
+<meta property="article:tag" content="c primer plus">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/code.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>C primer Plus Chap 05 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="C primer Plus Chap 05"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-05-14 10:26" pubdate>
+          2022年5月14日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          45 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">C primer Plus Chap 05</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="C-primer-Plus-Chap-05"><a href="#C-primer-Plus-Chap-05" class="headerlink" title="C primer Plus Chap 05"></a>C primer Plus Chap 05</h1><p>C primer Plus 第五章代码与练习记录。</p>
+<span id="more"></span>
+
+<h2 id="运算符、表达式和语句"><a href="#运算符、表达式和语句" class="headerlink" title="运算符、表达式和语句"></a>运算符、表达式和语句</h2><ul>
+<li>fx1.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	int x, y;<br>//	x = (2+3) * 6;<br>//	x = (12+6)/2*3;<br>//	y = x = (2+3)/4;<br>	y = 3 + 2*(x = 7/2);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;x = %d, y = %d.\n&quot;</span>, x, y);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">x = 3, y = 9.<br></code></pre></td></tr></table></figure></li>
+<li>fx2.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	int x;<br>//	x = (int)3.8 + 3.3;<br>//	x = (2+3)*10.5;<br>//	x = 3/5*22.0;<br>	x = 22.0 * 3 / 5;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;x = %d.\n&quot;</span>, x);<br>	<br>	<br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">x = 13.<br></code></pre></td></tr></table></figure></li>
+<li>fx3.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br><span class="hljs-comment">#include &lt;float.h&gt;</span><br>int main(void)<br>&#123;<br>	int i = 0;<br>	<span class="hljs-built_in">float</span> n;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;watch out! here come a bunch of fractions!\n&quot;</span>);<br>	<span class="hljs-keyword">while</span> (i++ &lt; 30)<br>	&#123;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\t&quot;</span>, i);<br>		n = 1.0 / i; <br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%f\t&quot;</span>,n);<br>	&#125;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;that&#x27;s all, folks!\n&quot;</span>);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">1	1.000000	2	0.500000	3	0.333333	4	0.250000	5	0.200000	6	0.166667	7	0.142857	8	0.125000	9	0.111111	10	0.100000	11	0.090909	12	0.083333	13	0.076923	14	0.071429	15	0.066667	16	0.062500	17	0.058824	18	0.055556	19	0.052632	20	0.050000	21	0.047619	22	0.045455	23	0.043478	24	0.041667	25	0.040000	26	0.038462	27	0.037037	28	0.035714	29	0.034483	30	0.033333	that<span class="hljs-string">&#x27;s all, folks!</span><br></code></pre></td></tr></table></figure></li>
+<li>fx4.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br><span class="hljs-comment">#define S_TO_M 60</span><br>int main(void)<br>&#123;<br>	int sec, min, left;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;this program converts seconds to minutes and seconds.\n&quot;</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;just enter the number of seconds.\n&quot;</span>);<br>	scanf(<span class="hljs-string">&quot;%d&quot;</span>, &amp;sec);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;the sec is %d\n&quot;</span>, sec);<br>	<span class="hljs-keyword">while</span>(sec&gt;0)<br>	&#123;<br>		min = sec / S_TO_M;<br>		left = sec % S_TO_M;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d sec is %d min and %d sec.\n&quot;</span>, sec, min, left);<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;please enter the number of seconds:\n&quot;</span>);<br>		scanf(<span class="hljs-string">&quot;%d&quot;</span>, &amp;sec);<br>	&#125;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;bye!\n&quot;</span>);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">this program converts seconds to minutes and seconds.<br>just enter the number of seconds.<br>123<br>the sec is 123<br>123 sec is 2 min and 3 sec.<br>please enter the number of seconds:<br>0<br><span class="hljs-built_in">bye</span>!<br></code></pre></td></tr></table></figure></li>
+<li>fx5.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br><span class="hljs-comment">#define FORMAT &quot;%s! C is cool!\n&quot;</span><br>int main(void)<br>&#123;<br>	int num = 10;<br>	<span class="hljs-built_in">printf</span>(FORMAT, FORMAT);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, ++num);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, num++);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, num--);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, num);<br>	<br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">%s! C is cool!<br>! C is cool!<br>11<br>11<br>12<br>11<br></code></pre></td></tr></table></figure></li>
+<li>xf6.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	char c1, c2;<br>	int diff;<br>	<span class="hljs-built_in">float</span> num;<br>	<br>	c1 = <span class="hljs-string">&#x27;S&#x27;</span>;<br>	c2 = <span class="hljs-string">&#x27;0&#x27;</span>;<br>	diff = c1 - c2;<br>	num = diff;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%c%c%c: %d %3.2f\n&quot;</span>, c1, c2, c1, diff, num);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">S0S: 35 35.00<br></code></pre></td></tr></table></figure></li>
+<li>fx7.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br><span class="hljs-comment">#define TEN 10</span><br>int main(void)<br>&#123;<br>	int n = 0;<br>	<span class="hljs-keyword">while</span>(n++ &lt; TEN)<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%5d&quot;</span>, n);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">1    2    3    4    5    6    7    8    9   10<br></code></pre></td></tr></table></figure></li>
+<li>fx8.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	int a = 96;<br>	<span class="hljs-keyword">while</span>(a++ &lt; 103)	<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%5c&quot;</span>, a);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br>	<br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">a    b    c    d    e    f    g<br></code></pre></td></tr></table></figure></li>
+<li>fx9.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	int x = 0;<br>	<span class="hljs-keyword">while</span>(++x &lt; 3)<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%4d&quot;</span>, x);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">1   2<br></code></pre></td></tr></table></figure></li>
+<li>fx9b.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	int x = 100;<br>	<br>	<span class="hljs-keyword">while</span>(x++ &lt; 103)<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%4d\n&quot;</span>, x);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%4d\n&quot;</span>, x);<br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">101<br>102<br>103<br>104<br></code></pre></td></tr></table></figure></li>
+<li>fx9c.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	char ch = <span class="hljs-string">&#x27;s&#x27;</span>;<br>	<span class="hljs-keyword">while</span>(ch &lt; <span class="hljs-string">&#x27;w&#x27;</span>)<br>	&#123;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%c\t&quot;</span>, ch);<br>		ch++;<br>	&#125;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">s	t	u	v<br></code></pre></td></tr></table></figure></li>
+<li>fx10.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br><span class="hljs-comment">#define MESG &quot;COMPUTER BYTES DOG&quot;</span><br>int main(void)<br>&#123;<br>	int n = 0;<br>	<br>	<span class="hljs-keyword">while</span>(n&lt;5)<br>	&#123;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%s\n&quot;</span>, MESG);<br>		n++;<br>	&#125;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;that&#x27;s all.\n&quot;</span>);<br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">COMPUTER BYTES DOG<br>COMPUTER BYTES DOG<br>COMPUTER BYTES DOG<br>COMPUTER BYTES DOG<br>COMPUTER BYTES DOG<br>that<span class="hljs-string">&#x27;s all.</span><br></code></pre></td></tr></table></figure></li>
+<li>xt1.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	int x;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;please enter a number:\n&quot;</span>);<br>	scanf(<span class="hljs-string">&quot;%d&quot;</span>, &amp;x);<br>	x = x + 10;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\n&quot;</span>, x);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">please enter number of nimutes:<br>26<br>26 minutes is about 0 hour and 26 minutes<br>please enter number of nimutes:<br>160<br>160 minutes is about 2 hour and 40 minutes<br>please enter number of nimutes:<br>0<br><span class="hljs-keyword">done</span>!<br></code></pre></td></tr></table></figure></li>
+<li>xt2.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	int number, count;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;please enter a number:\n&quot;</span>);<br>	scanf(<span class="hljs-string">&quot;%d&quot;</span>, &amp;number);<br>	count = number + 10;<br>	<span class="hljs-keyword">while</span>(number++ &lt;= count)<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d\t&quot;</span>, number-1);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">please enter a number:<br>12<br>12	13	14	15	16	17	18	19	20	21	22<br></code></pre></td></tr></table></figure></li>
+<li>xt3.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>int main(void)<br>&#123;<br>	const D_TO_W = 7;<br>	int day, week, left;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;please enter the days:\n&quot;</span>);<br>	scanf(<span class="hljs-string">&quot;%d&quot;</span>, &amp;day);<br>	<span class="hljs-keyword">while</span>(day &gt; 0)<br>	&#123;<br>		week = day / D_TO_W;<br>		left = day % D_TO_W;<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d days are %d weeks, %d days.\n&quot;</span>, day, week, left);<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;please enter the days:\n&quot;</span>);<br>		scanf(<span class="hljs-string">&quot;%d&quot;</span>, &amp;day);<br>	&#125;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;done!\n&quot;</span>);<br><br>	<span class="hljs-built_in">return</span> 0;<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">please enter the days:<br>7<br>7 days are 1 weeks, 0 days.<br>please enter the days:<br>26<br>26 days are 3 weeks, 5 days.<br>please enter the days:<br>0<br><span class="hljs-keyword">done</span>!<br></code></pre></td></tr></table></figure></li>
+<li>xt5.c<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#include &lt;stdio.h&gt;</span><br>void cubed(<span class="hljs-built_in">float</span> n);<br>int main(void)<br>&#123;<br>	<span class="hljs-built_in">float</span> number;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;enter 0 to quit the programe.\n&quot;</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;please enter a number:\n&quot;</span>);<br>	scanf(<span class="hljs-string">&quot;%f&quot;</span>, &amp;number);<br>	<span class="hljs-keyword">while</span>(number &gt; 0)<br>	&#123;<br>		cubed(number);<br>		<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;please enter a number:\n&quot;</span>);<br>		scanf(<span class="hljs-string">&quot;%f&quot;</span>, &amp;number);<br>	&#125;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;the end!\n&quot;</span>);<br>	<br>&#125;<br><br>void cubed(<span class="hljs-built_in">float</span> n)<br>&#123;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%.6f&#x27;s cubed is %.6f.\n&quot;</span>, n, n*n*n);<br>&#125;<br></code></pre></td></tr></table></figure>
+输出结果：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">enter 0 to quit the programe.<br>please enter a number:<br>2<br>2.000000<span class="hljs-string">&#x27;s cubed is 8.000000.</span><br><span class="hljs-string">please enter a number:</span><br><span class="hljs-string">0</span><br><span class="hljs-string">the end!</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/code/" class="category-chain-item">code</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/security/">#security</a>
+      
+        <a href="/tags/c/">#c</a>
+      
+        <a href="/tags/c-primer-plus/">#c primer plus</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>C primer Plus Chap 05</div>
+      <div>https://ywmy.xyz/2022/05/14/C-primer-Plus-Chap-05/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年5月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/05/14/C-primer-Plus-Chap-06/" title="C primer Plus Chap 06">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">C primer Plus Chap 06</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/13/C-primer-Plus-Chap-04/" title="C primer Plus Chap 04">
+                        <span class="hidden-mobile">C primer Plus Chap 04</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

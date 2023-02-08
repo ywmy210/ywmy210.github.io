@@ -1,0 +1,741 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="cisco 4507 enable 密码恢复公司项目上的一个问题，一台cisco 4507的交换机，被其它维护单位更改了enable密码，后面问到是否有更改密码，对方坚持说没有改过。着急配置，没办法只能着手恢复enable密码。操作记录备忘。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cisco 恢复 enable 密码">
+<meta property="og:url" content="https://ywmy.xyz/2021/02/01/cisco-%E6%81%A2%E5%A4%8D-enable-%E5%AF%86%E7%A0%81/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="cisco 4507 enable 密码恢复公司项目上的一个问题，一台cisco 4507的交换机，被其它维护单位更改了enable密码，后面问到是否有更改密码，对方坚持说没有改过。着急配置，没办法只能着手恢复enable密码。操作记录备忘。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/network.jpg">
+<meta property="article:published_time" content="2021-02-01T02:25:05.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.677Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="cisco">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/network.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>cisco 恢复 enable 密码 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="cisco 恢复 enable 密码"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-02-01 10:25" pubdate>
+          2021年2月1日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          52 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">cisco 恢复 enable 密码</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="cisco-4507-enable-密码恢复"><a href="#cisco-4507-enable-密码恢复" class="headerlink" title="cisco 4507 enable 密码恢复"></a>cisco 4507 enable 密码恢复</h1><p>公司项目上的一个问题，一台cisco 4507的交换机，被其它维护单位更改了enable密码，后面问到是否有更改密码，对方坚持说没有改过。着急配置，没办法只能着手恢复enable密码。操作记录备忘。</p>
+<span id="more"></span>
+
+<p><strong>Tips:恢复enable密码的操作不会丢失配置信息。建议通过tftp备份配置后操作。</strong></p>
+<h2 id="1、重启设备加电"><a href="#1、重启设备加电" class="headerlink" title="1、重启设备加电"></a>1、重启设备加电</h2><p>重启后进入引导界面，5秒内按住<strong>Ctrl-C</strong>键，防止自动引导，进入ROM监视提示模式。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs bash">!--- Here, you power cycle the switch.<br><br>********************************************************** <br> *                                                        * <br> * Welcome to ROM Monitor <span class="hljs-keyword">for</span> WS-X4014 System.            * <br> * Copyright (c) 1999-2000, 2001 by Cisco Systems, Inc.   * <br> * All rights reserved.                                   * <br> *                                                        * <br> **********************************************************<br> <br> ROM Monitor Program Version 12.1(10r)EY(1.21) <br><br> Board <span class="hljs-built_in">type</span> 1, Board revision 7<br> Swamp FPGA revision 16, Dagobah FPGA revision 43 <br> <br> Timer interrupt <span class="hljs-built_in">test</span> passed.<br><br> MAC Address  : 00-02-b9-83-af-fe <br> IP Address   : 172.16.84.122 <br> Netmask      : 255.255.255.0 <br> Gateway      : 172.16.84.1 <br> TftpServer   : Not <span class="hljs-built_in">set</span>. <br> Main Memory  : 256 MBytes<br><br><br> ***** The system will autoboot <span class="hljs-keyword">in</span> 5 seconds *****<br><br><br> Type control-C to prevent autobooting. <br><br>!--- At this point, press Ctrl-C.<br><br>Autoboot cancelled......... please <span class="hljs-built_in">wait</span>!!!<br>Autoboot cancelled......... please <span class="hljs-built_in">wait</span>!!!<br>rommon 1 &gt; [interrupt]  <br><br>!--- The module ended <span class="hljs-keyword">in</span> the ROMmon.<br><br>rommon 1 &gt; [interrupt]<br></code></pre></td></tr></table></figure>
+
+<h2 id="2、在common模式下使用confreg配置"><a href="#2、在common模式下使用confreg配置" class="headerlink" title="2、在common模式下使用confreg配置"></a>2、在common模式下使用confreg配置</h2><p>使重新启动从新的寄存器中加载配置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs bash">rommon 1 &gt; <span class="hljs-built_in">set</span><br>rommon 1 &gt; confreg<br><br> Configuration Summary : <br> =&gt; load ROM after netboot fails<br> =&gt; console baud: 9600<br> =&gt; autoboot from: commands specified <span class="hljs-keyword">in</span> <span class="hljs-string">&#x27;BOOT&#x27;</span> environment variable<br><br> <span class="hljs-keyword">do</span> you wish to change the configuration? y/n  [n]:  **y**<br> <span class="hljs-built_in">enable</span>  <span class="hljs-string">&quot;diagnostic mode&quot;</span>? y/n  [n]:  **n**<br> <span class="hljs-built_in">enable</span>  <span class="hljs-string">&quot;use net in IP bcast address&quot;</span>? y/n  [n]:  **n**<br> <span class="hljs-built_in">disable</span> <span class="hljs-string">&quot;load ROM after netboot fails&quot;</span>? y/n  [n]:  **n**<br> <span class="hljs-built_in">enable</span>  <span class="hljs-string">&quot;use all zero broadcast&quot;</span>? y/n  [n]:  **n**<br> <span class="hljs-built_in">enable</span>  <span class="hljs-string">&quot;break/abort has effect&quot;</span>? y/n  [n]:  **n**<br> <span class="hljs-built_in">enable</span>  <span class="hljs-string">&quot;ignore system config info&quot;</span>? y/n  [n]:  **y**<br><br> change console baud rate? y/n  [n]:  **n**<br><br> change the boot characteristics? y/n  [n]:  **n**<br><br> Configuration Summary : <br> =&gt; load ROM after netboot fails<br> =&gt; ignore system config info<br> =&gt; console baud: 9600<br> =&gt; autoboot from: commands specified <span class="hljs-keyword">in</span> <span class="hljs-string">&#x27;BOOT&#x27;</span> environment variable<br><br> <span class="hljs-keyword">do</span> you wish to save this configuration? y/n  [n]:  y<br> You must reset or power cycle <span class="hljs-keyword">for</span> new configuration to take effect<br>Note: You can also use the confreg 0x2142 <span class="hljs-built_in">command</span> at the ROMmon prompt <span class="hljs-keyword">in</span> order to <span class="hljs-built_in">set</span> the configuration register value to bypass the startup configuration stored <span class="hljs-keyword">in</span> NVRAM.<br><br>rommon 1 &gt;confreg 0x2142  <span class="hljs-comment">#记住这里寄存器的位置</span><br>You must reset or power cycle <span class="hljs-keyword">for</span> the new configuration to take effect.<br></code></pre></td></tr></table></figure>
+
+<h2 id="3、重启设备"><a href="#3、重启设备" class="headerlink" title="3、重启设备"></a>3、重启设备</h2><p>使用reset命令重新引导模块，因为第二步中配置忽略系统配置信息，这里将不会引导已保存的配置信息。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>rommon 2 &gt; reset<br><br>Resetting .......<br><br>rommon 3 &gt;<br><br> ********************************************************** <br> *                                                        * <br> * Welcome to ROM Monitor <span class="hljs-keyword">for</span> WS-X4014 System.            * <br> * Copyright (c) 1999-2000, 2001 by Cisco Systems, Inc.   * <br> * All rights reserved.                                   * <br> *                                                        * <br> **********************************************************<br><br>!--- Output suppressed.<br><br>Press RETURN to get started! <br><br>!--- Press Return.<br><br>00:00:21: %SYS-5-RESTART: System restarted --<br>Cisco Internetwork Operating System Software <br>IOS (tm) Catalyst 4000 L3 Switch Software (cat4000-IS-M), <br>   Version 12.1(8a)EW,  RELEASE SOFTWARE (fc1)<br>TAC Support: http://www.cisco.com/tac<br>Copyright (c) 1986-2002 by cisco Systems, Inc.<br>Compiled Thu 24-Jan-02 17:34 by ccai<br>00:00:21: %SNMP-5-COLDSTART: SNMP agent on host Switch <br>   is undergoing a cold start<br>Switch&gt;<br></code></pre></td></tr></table></figure>
+
+<h2 id="4、加载"><a href="#4、加载" class="headerlink" title="4、加载"></a>4、加载</h2><p>此值使设备从Flash启动，而无需加载已保存的配置。在Switch提示符下发出enable命令进入启用模式。然后，使用show version命令以检查配置寄存器值。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs bash">Switch&gt; <span class="hljs-built_in">enable</span><br>Switch<span class="hljs-comment">#show version</span><br>Cisco Internetwork Operating System Software <br>IOS (TM) Catalyst 4000 L3 Switch Software (cat4000-IS-M),<br>   Version 12.1(8a)EW,  RELEASE SOFTWARE (fc1)<br>TAC Support: http://www.cisco.com/tac<br>Copyright (c) 1986-2002 by cisco Systems, Inc.<br>Compiled Thu 24-Jan-02 17:34 by ccai<br>Image text-base: 0x00000000, data-base: 0x00AA2B8C<br><br>ROM: 12.1(10r)EY(1.21)<br>Switch <span class="hljs-built_in">uptime</span> is 5 minutes<br>System returned to ROM by reload<br>Running default software<br><br>cisco WS-C4006 (MPC8245) processor (revision 7) with 262144K bytes of memory.<br>Processor board ID FOX04183666<br>Last reset from Reload<br>32 Gigabit Ethernet/IEEE 802.3 interface(s)<br>467K bytes of non-volatile configuration memory.<br><br>Configuration register is 0x2142  <span class="hljs-comment">#查看加载的寄存器地址</span><br><br>Switch<span class="hljs-comment">#</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="5、将配置恢复到内存中"><a href="#5、将配置恢复到内存中" class="headerlink" title="5、将配置恢复到内存中"></a>5、将配置恢复到内存中</h2><p>使用configure memory命令或copy startup-config running-config命令将NVRAM复制到内存中。<br>请勿使用configure terminal命令，该命令显示模块的默认配置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">Switch<span class="hljs-comment">#configure memory</span><br><br>Uncompressed configuration from 1307 bytes to 3014 bytes<br>Switch<span class="hljs-comment">#</span><br>00:13:52: %SYS-5-CONFIG_I: Configured from memory by console<br>c-4006-SUPIII<span class="hljs-comment">#</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="6、检查接口状态"><a href="#6、检查接口状态" class="headerlink" title="6、检查接口状态"></a>6、检查接口状态</h2><p>使用show ip interface brief命令以确保之前使用的接口显示“ up up ”状态。<br>如果在密码恢复之前使用的任何接口显示“ down ”，请在该接口上发出no shutdown命令以启动接口。</p>
+<h2 id="7、检查配置文件"><a href="#7、检查配置文件" class="headerlink" title="7、检查配置文件"></a>7、检查配置文件</h2><p>使用write terminal命令和show running-config命令检查配置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs bash">c-4006-SUPIII<span class="hljs-comment">#show running-config </span><br>Building configuration...<br><br>Current configuration : 3014 bytes<br>!<br>version 12.1<br>no service pad<br>service timestamps debug <span class="hljs-built_in">uptime</span><br>service timestamps <span class="hljs-built_in">log</span> <span class="hljs-built_in">uptime</span><br>no service password-encryption<br>service compress-config<br>!<br>hostname c-4006-SUPIII<br>!<br>boot system flash bootflash:<br>!<br>vtp mode transparent<br><br>!--- Output suppressed.<br><br>line con 0<br> stopbits 1<br>line vty 0 4<br> login<br>!<br>end<br><br>c-4006-SUPIII<span class="hljs-comment">#</span><br></code></pre></td></tr></table></figure>
+
+<p>现在可以更改密码了。</p>
+<h2 id="更改密码"><a href="#更改密码" class="headerlink" title="更改密码"></a>更改密码</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">c-4006-SUPIII<span class="hljs-comment">#configure terminal </span><br>Enter configuration commands, one per line.  End with CNTL/Z.<br>c-4006-SUPIII(config)<span class="hljs-comment">#no enable secret  #删除旧密码</span><br><br>!--- This step is necessary <span class="hljs-keyword">if</span> the switch had an <span class="hljs-built_in">enable</span> !--- secret password.<br><br><br>c-4006-SUPIII(config)<span class="hljs-comment">#enable secret &lt; password &gt;  设置新密码</span><br>[Choose a strong password with at least one capital letter,<br> one number, and one special character.]<br><br>!--- This <span class="hljs-built_in">command</span> sets the new password.<br></code></pre></td></tr></table></figure>
+
+<h2 id="确保将配置寄存器的值改回0x2102"><a href="#确保将配置寄存器的值改回0x2102" class="headerlink" title="确保将配置寄存器的值改回0x2102"></a>确保将配置寄存器的值改回0x2102</h2><p>在config模式下更改寄存器的值，并查看下一次启动引导寄存器位置是否正确。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs bash">c-4006-SUPIII(config)<span class="hljs-comment">#config-register 0x2102</span><br>c-4006-SUPIII(config)<span class="hljs-comment"># ^Z</span><br>c-4006-SUPIII<span class="hljs-comment">#</span><br>00:19:01: %SYS-5-CONFIG_I: Configured from console by console<br>c-4006-SUPIII<span class="hljs-comment">#write memory </span><br><br>!--- This step saves the configuration.<br><br>Building configuration...<br>Compressed configuration from 3061 bytes to 1365 bytes[OK]<br>c-4006-SUPIII<span class="hljs-comment">#show version </span><br><br>!--- This step verifies the value change.<br><br>Cisco Internetwork Operating System Software <br>IOS (TM) Catalyst 4000 L3 Switch Software (cat4000-IS-M), <br>Version 12.1(8a)EW,  RELEASE SOFTWARE (fc1)<br>TAC Support: http://www.cisco.com/tac<br>Copyright (c) 1986-2002 by cisco Systems, Inc.<br>Compiled Thu 24-Jan-02 17:34 by ccai<br>Image text-base: 0x00000000, database: 0x00AA2B8C<br><br>ROM: 12.1(10r)EY(1.21)<br>c-4006-SUPIII <span class="hljs-built_in">uptime</span> is 20 minutes<br>System returned to ROM by reload<br>Running default software<br><br>cisco WS-C4006 (MPC8245) processor (revision 7) with 262144K bytes of memory.<br>Processor board ID FOX04183666<br>Last reset from Reload<br>32 Gigabit Ethernet/IEEE 802.3 interface(s)<br>467K bytes of nonvolatile configuration memory.<br><br>Configuration register is 0x2142 (will be 0x2102 at next reload)<br><br>c-4006-SUPIII<span class="hljs-comment">#</span><br></code></pre></td></tr></table></figure>
+
+<p>到这一步，已经完成enable密码更改了。</p>
+<p>参考<a target="_blank" rel="noopener" href="https://www.cisco.com/c/en/us/support/docs/switches/catalyst-4000-series-switches/21229-pswdrec-cat4000-supiii-21229.html">链接</a>，<a target="_blank" rel="noopener" href="https://www.hello2099.com/1913.html">链接</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/network/" class="category-chain-item">network</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/cisco/">#cisco</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>cisco 恢复 enable 密码</div>
+      <div>https://ywmy.xyz/2021/02/01/cisco-恢复-enable-密码/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年2月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/02/22/history-%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F/" title="history 环境变量">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">history 环境变量</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/01/31/mu-editor-python3-PyQt5%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98/" title="mu-editor python3 PyQt5相关问题">
+                        <span class="hidden-mobile">mu-editor python3 PyQt5相关问题</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

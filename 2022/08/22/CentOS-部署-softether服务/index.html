@@ -1,0 +1,746 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="CentOS 部署 softether服务SoftEther VPN 项目开发和分发 SoftEther VPN， 一个开源的免费跨平台多协议 VPN 程序， 作为日本筑波大学的一个学术项目，在 Apache 许可证 2.0 下发布。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 部署 softether服务">
+<meta property="og:url" content="https://ywmy.xyz/2022/08/22/CentOS-%E9%83%A8%E7%BD%B2-softether%E6%9C%8D%E5%8A%A1/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="CentOS 部署 softether服务SoftEther VPN 项目开发和分发 SoftEther VPN， 一个开源的免费跨平台多协议 VPN 程序， 作为日本筑波大学的一个学术项目，在 Apache 许可证 2.0 下发布。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2022-08-22T12:12:23.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.657Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="vpn">
+<meta property="article:tag" content="softether">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>CentOS 部署 softether服务 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CentOS 部署 softether服务"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-08-22 20:12" pubdate>
+          2022年8月22日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          19k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          158 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CentOS 部署 softether服务</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="CentOS-部署-softether服务"><a href="#CentOS-部署-softether服务" class="headerlink" title="CentOS 部署 softether服务"></a>CentOS 部署 softether服务</h1><p>SoftEther VPN 项目开发和分发 SoftEther VPN， 一个开源的免费跨平台多协议 VPN 程序， 作为日本筑波大学的一个学术项目，在 Apache 许可证 2.0 下发布。</p>
+<span id="more"></span>
+
+<h2 id="安装配置"><a href="#安装配置" class="headerlink" title="安装配置"></a>安装配置</h2><h3 id="安装程序依赖"><a href="#安装程序依赖" class="headerlink" title="安装程序依赖"></a>安装程序依赖</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum groupinstall <span class="hljs-string">&quot;Development Tools&quot;</span><br>yum install readline-devel openssl-devel ncurses-devel<br></code></pre></td></tr></table></figure>
+
+<h3 id="下载程序并安装"><a href="#下载程序并安装" class="headerlink" title="下载程序并安装"></a>下载程序并安装</h3><p>softether的下载<a target="_blank" rel="noopener" href="http://softether.fishinfo.cn/cn.aspx">链接</a></p>
+<p>选择VPN SERVER组件，选择对应的系统和CPU构架。下载的服务安装文件上传到服务器上，解压缩安装包。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf softether-vpnserver-v4.39-9772-beta-2022.04.26-linux-x64-64bit.tar.gz <br><span class="hljs-built_in">mv</span> vpnserver /usr/local/<br><span class="hljs-built_in">cd</span> /usr/local/<br><span class="hljs-built_in">chmod</span> 755 ./vpnserver/ -R<br><span class="hljs-built_in">cd</span> vpnserver<br></code></pre></td></tr></table></figure>
+<p>编译安装文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># make</span><br>--------------------------------------------------------------------<br><br>SoftEther VPN Server (Ver 4.39, Build 9772, Intel x64 / AMD64) <span class="hljs-keyword">for</span> Linux Build Utility<br>Copyright (c) SoftEther Project at University of Tsukuba, Japan. All Rights Reserved.<br><br>--------------------------------------------------------------------<br><br><br>Copyright (c) all contributors on SoftEther VPN project <span class="hljs-keyword">in</span> GitHub.<br>Copyright (c) Daiyuu Nobori, SoftEther Project at University of Tsukuba, and SoftEther Corporation.<br><br>Licensed under the Apache License, Version 2.0 (the <span class="hljs-string">&quot;License&quot;</span>);<br>you may not use this file except <span class="hljs-keyword">in</span> compliance with the License.<br>You may obtain a copy of the License at<br><br>    http://www.apache.org/licenses/LICENSE-2.0<br><br>Unless required by applicable law or agreed to <span class="hljs-keyword">in</span> writing, software distributed under the License is distributed on an <span class="hljs-string">&quot;AS IS&quot;</span> BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<br>See the License <span class="hljs-keyword">for</span> the specific language governing permissions and limitations under the License.<br><br><br>DISCLAIMER<br>==========<br><br>THE SOFTWARE IS PROVIDED <span class="hljs-string">&quot;AS IS&quot;</span>, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.<br><br>THIS SOFTWARE IS DEVELOPED IN JAPAN, AND DISTRIBUTED FROM JAPAN, UNDER JAPANESE LAWS. YOU MUST AGREE IN ADVANCE TO USE, COPY, MODIFY, MERGE, PUBLISH, DISTRIBUTE, SUBLICENSE, AND/OR SELL COPIES OF THIS SOFTWARE, THAT ANY JURIDICAL DISPUTES WHICH ARE CONCERNED TO THIS SOFTWARE OR ITS CONTENTS, AGAINST US (SOFTETHER PROJECT, SOFTETHER CORPORATION, DAIYUU NOBORI OR OTHER SUPPLIERS), OR ANY JURIDICAL DISPUTES AGAINST US WHICH ARE CAUSED BY ANY KIND OF USING, COPYING, MODIFYING, MERGING, PUBLISHING, DISTRIBUTING, SUBLICENSING, AND/OR SELLING COPIES OF THIS SOFTWARE SHALL BE REGARDED AS BE CONSTRUED AND CONTROLLED BY JAPANESE LAWS, AND YOU MUST FURTHER CONSENT TO EXCLUSIVE JURISDICTION AND VENUE IN THE COURTS SITTING IN TOKYO, JAPAN. YOU MUST WAIVE ALL DEFENSES OF LACK OF PERSONAL JURISDICTION AND FORUM NON CONVENIENS. PROCESS MAY BE SERVED ON EITHER PARTY IN THE MANNER AUTHORIZED BY APPLICABLE LAW OR COURT RULE.<br><br>USE ONLY IN JAPAN. DO NOT USE THIS SOFTWARE IN ANOTHER COUNTRY UNLESS YOU HAVE A CONFIRMATION THAT THIS SOFTWARE DOES NOT VIOLATE ANY CRIMINAL LAWS OR CIVIL RIGHTS IN THAT PARTICULAR COUNTRY. USING THIS SOFTWARE IN OTHER COUNTRIES IS COMPLETELY AT YOUR OWN RISK. THE SOFTETHER VPN PROJECT HAS DEVELOPED AND DISTRIBUTED THIS SOFTWARE TO COMPLY ONLY WITH THE JAPANESE LAWS AND EXISTING CIVIL RIGHTS INCLUDING PATENTS WHICH ARE SUBJECTS APPLY IN JAPAN. OTHER COUNTRIES<span class="hljs-string">&#x27; LAWS OR CIVIL RIGHTS ARE NONE OF OUR CONCERNS NOR RESPONSIBILITIES. WE HAVE NEVER INVESTIGATED ANY CRIMINAL REGULATIONS, CIVIL LAWS OR INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENTS IN ANY OF OTHER 200+ COUNTRIES AND TERRITORIES. BY NATURE, THERE ARE 200+ REGIONS IN THE WORLD, WITH DIFFERENT LAWS. IT IS IMPOSSIBLE TO VERIFY EVERY COUNTRIES&#x27;</span> LAWS, REGULATIONS AND CIVIL RIGHTS TO MAKE THE SOFTWARE COMPLY WITH ALL COUNTRIES<span class="hljs-string">&#x27; LAWS BY THE PROJECT. EVEN IF YOU WILL BE SUED BY A PRIVATE ENTITY OR BE DAMAGED BY A PUBLIC SERVANT IN YOUR COUNTRY, THE DEVELOPERS OF THIS SOFTWARE WILL NEVER BE LIABLE TO RECOVER OR COMPENSATE SUCH DAMAGES, CRIMINAL OR CIVIL</span><br><span class="hljs-string">RESPONSIBILITIES. NOTE THAT THIS LINE IS NOT LICENSE RESTRICTION BUT JUST A STATEMENT FOR WARNING AND DISCLAIMER.</span><br><span class="hljs-string"></span><br><span class="hljs-string">READ AND UNDERSTAND THE &#x27;</span>src/WARNING.TXT<span class="hljs-string">&#x27; FILE BEFORE USING THIS SOFTWARE. SOME SOFTWARE PROGRAMS FROM THIRD PARTIES ARE INCLUDED ON THIS SOFTWARE WITH LICENSE CONDITIONS WHICH ARE DESCRIBED ON THE &#x27;</span>src/THIRD_PARTY.TXT<span class="hljs-string">&#x27; FILE.</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">--------------------------------------------------------------------</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">make[1]: Entering directory `/usr/local/vpnserver&#x27;</span><br>Preparing SoftEther VPN Server...<br>ranlib lib/libcharset.a<br>ranlib lib/libcrypto.a<br>ranlib lib/libedit.a<br>ranlib lib/libiconv.a<br>ranlib lib/libintelaes.a<br>ranlib lib/libncurses.a<br>ranlib lib/libssl.a<br>ranlib lib/libz.a<br>ranlib code/vpnserver.a<br>gcc code/vpnserver.a -fPIE -O2 -fsigned-char -pthread -m64 -lm -lrt -lpthread -L./ lib/libssl.a lib/libcrypto.a lib/libiconv.a lib/libcharset.a lib/libedit.a lib/libncurses.a lib/libz.a lib/libintelaes.a -ldl -o vpnserver<br>ranlib code/vpncmd.a<br>gcc code/vpncmd.a -fPIE -O2 -fsigned-char -pthread -m64 -lm -lrt -lpthread -L./ lib/libssl.a lib/libcrypto.a lib/libiconv.a lib/libcharset.a lib/libedit.a lib/libncurses.a lib/libz.a lib/libintelaes.a -ldl -o vpncmd<br>./vpncmd /tool /cmd:Check<br>vpncmd <span class="hljs-built_in">command</span> - SoftEther VPN Command Line Management Utility<br>SoftEther VPN Command Line Management Utility (vpncmd <span class="hljs-built_in">command</span>)<br>Version 4.39 Build 9772   (English)<br>Compiled 2022/04/26 18:00:50 by buildsan at crosswin<br>Copyright (c) SoftEther VPN Project. All Rights Reserved.<br><br>VPN Tools has been launched. By inputting HELP, you can view a list of the commands that can be used.<br><br>VPN Tools&gt;Check<br>Check <span class="hljs-built_in">command</span> - Check whether SoftEther VPN Operation is Possible<br>---------------------------------------------------<br>SoftEther VPN Operation Environment Check Tool<br><br>Copyright (c) SoftEther VPN Project.<br>All Rights Reserved.<br><br>If this operation environment check tool is run on a system and that system passes, it is most likely that SoftEther VPN software can operate on that system. This check may take a <span class="hljs-keyword">while</span>. Please <span class="hljs-built_in">wait</span>...<br><br>Checking <span class="hljs-string">&#x27;Kernel System&#x27;</span>... <br>              Pass<br>Checking <span class="hljs-string">&#x27;Memory Operation System&#x27;</span>... <br>              Pass<br>Checking <span class="hljs-string">&#x27;ANSI / Unicode string processing system&#x27;</span>... <br>              Pass<br>Checking <span class="hljs-string">&#x27;File system&#x27;</span>... <br>              Pass<br>Checking <span class="hljs-string">&#x27;Thread processing system&#x27;</span>... <br>              Pass<br>Checking <span class="hljs-string">&#x27;Network system&#x27;</span>... <br>              Pass<br><br>All checks passed. It is most likely that SoftEther VPN Server / Bridge can operate normally on this system.<br><br>The <span class="hljs-built_in">command</span> completed successfully.<br><br><br>--------------------------------------------------------------------<br>The preparation of SoftEther VPN Server is completed !<br><br><br>*** How to switch the display language of the SoftEther VPN Server Service ***<br>SoftEther VPN Server supports the following languages:<br>  - Japanese<br>  - English<br>  - Simplified Chinese<br><br>You can choose your prefered language of SoftEther VPN Server at any time.<br>To switch the current language, open and edit the <span class="hljs-string">&#x27;lang.config&#x27;</span> file.<br><br><br>Note: the administrative password is not <span class="hljs-built_in">set</span> on the VPN Server. Please <span class="hljs-built_in">set</span> your own administrative password as soon as possible by vpncmd or the GUI manager.<br><br><br>*** How to start the SoftEther VPN Server Service ***<br><br>Please execute <span class="hljs-string">&#x27;./vpnserver start&#x27;</span> to run the SoftEther VPN Server Background Service.<br>And please execute <span class="hljs-string">&#x27;./vpncmd&#x27;</span> to run the SoftEther VPN Command-Line Utility to configure SoftEther VPN Server.<br><br>Of course, you can use the VPN Server Manager GUI Application <span class="hljs-keyword">for</span> Windows / Mac OS X on the other Windows / Mac OS X computers <span class="hljs-keyword">in</span> order to configure the SoftEther VPN Server remotely.<br><br>*** For Windows <span class="hljs-built_in">users</span> ***<br>You can download the SoftEther VPN Server Manager <span class="hljs-keyword">for</span> Windows<br>from the http://www.softether-download.com/ web site.<br>This manager application helps you to completely and easily manage the VPN server services running <span class="hljs-keyword">in</span> remote hosts.<br><br><br>*** For Mac OS X <span class="hljs-built_in">users</span> ***<br>In April 2016 we released the SoftEther VPN Server Manager <span class="hljs-keyword">for</span> Mac OS X.<br>You can download it from the http://www.softether-download.com/ web site.<br>VPN Server Manager <span class="hljs-keyword">for</span> Mac OS X works perfectly as same as the traditional Windows versions. It helps you to completely and easily manage the VPN server services running <span class="hljs-keyword">in</span> remote hosts.<br><br><br><br>*** PacketiX VPN Server HTML5 Web Administration Console (NEW) ***<br>This VPN Server / Bridge has the built-in HTML5 Web Administration Console.<br><br>After you start the server daemon, you can open the HTML5 Web Administration Console is available at<br><br>https://127.0.0.1:5555/<br>or<br>https://ip_address_of_the_vpn_server:5555/<br><br>This HTML5 page is obviously under construction, and your HTML5 development contribution is very appreciated.<br><br>--------------------------------------------------------------------<br><br>make[1]: Leaving directory `/usr/local/vpnserver<span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># ./.install.sh </span><br>--------------------------------------------------------------------<br><br>SoftEther VPN Server (Ver 4.39, Build 9772, Intel x64 / AMD64) <span class="hljs-keyword">for</span> Linux Build Utility<br>Copyright (c) SoftEther Project at University of Tsukuba, Japan. All Rights Reserved.<br><br>--------------------------------------------------------------------<br><br><br>Copyright (c) all contributors on SoftEther VPN project <span class="hljs-keyword">in</span> GitHub.<br>Copyright (c) Daiyuu Nobori, SoftEther Project at University of Tsukuba, and SoftEther Corporation.<br><br>Licensed under the Apache License, Version 2.0 (the <span class="hljs-string">&quot;License&quot;</span>);<br>you may not use this file except <span class="hljs-keyword">in</span> compliance with the License.<br>You may obtain a copy of the License at<br><br>    http://www.apache.org/licenses/LICENSE-2.0<br><br>Unless required by applicable law or agreed to <span class="hljs-keyword">in</span> writing, software distributed under the License is distributed on an <span class="hljs-string">&quot;AS IS&quot;</span> BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<br>See the License <span class="hljs-keyword">for</span> the specific language governing permissions and limitations under the License.<br><br><br>DISCLAIMER<br>==========<br><br>THE SOFTWARE IS PROVIDED <span class="hljs-string">&quot;AS IS&quot;</span>, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.<br><br>THIS SOFTWARE IS DEVELOPED IN JAPAN, AND DISTRIBUTED FROM JAPAN, UNDER JAPANESE LAWS. YOU MUST AGREE IN ADVANCE TO USE, COPY, MODIFY, MERGE, PUBLISH, DISTRIBUTE, SUBLICENSE, AND/OR SELL COPIES OF THIS SOFTWARE, THAT ANY JURIDICAL DISPUTES WHICH ARE CONCERNED TO THIS SOFTWARE OR ITS CONTENTS, AGAINST US (SOFTETHER PROJECT, SOFTETHER CORPORATION, DAIYUU NOBORI OR OTHER SUPPLIERS), OR ANY JURIDICAL DISPUTES AGAINST US WHICH ARE CAUSED BY ANY KIND OF USING, COPYING, MODIFYING, MERGING, PUBLISHING, DISTRIBUTING, SUBLICENSING, AND/OR SELLING COPIES OF THIS SOFTWARE SHALL BE REGARDED AS BE CONSTRUED AND CONTROLLED BY JAPANESE LAWS, AND YOU MUST FURTHER CONSENT TO EXCLUSIVE JURISDICTION AND VENUE IN THE COURTS SITTING IN TOKYO, JAPAN. YOU MUST WAIVE ALL DEFENSES OF LACK OF PERSONAL JURISDICTION AND FORUM NON CONVENIENS. PROCESS MAY BE SERVED ON EITHER PARTY IN THE MANNER AUTHORIZED BY APPLICABLE LAW OR COURT RULE.<br><br>USE ONLY IN JAPAN. DO NOT USE THIS SOFTWARE IN ANOTHER COUNTRY UNLESS YOU HAVE A CONFIRMATION THAT THIS SOFTWARE DOES NOT VIOLATE ANY CRIMINAL LAWS OR CIVIL RIGHTS IN THAT PARTICULAR COUNTRY. USING THIS SOFTWARE IN OTHER COUNTRIES IS COMPLETELY AT YOUR OWN RISK. THE SOFTETHER VPN PROJECT HAS DEVELOPED AND DISTRIBUTED THIS SOFTWARE TO COMPLY ONLY WITH THE JAPANESE LAWS AND EXISTING CIVIL RIGHTS INCLUDING PATENTS WHICH ARE SUBJECTS APPLY IN JAPAN. OTHER COUNTRIES<span class="hljs-string">&#x27; LAWS OR CIVIL RIGHTS ARE NONE OF OUR CONCERNS NOR RESPONSIBILITIES. WE HAVE NEVER INVESTIGATED ANY CRIMINAL REGULATIONS, CIVIL LAWS OR INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENTS IN ANY OF OTHER 200+ COUNTRIES AND TERRITORIES. BY NATURE, THERE ARE 200+ REGIONS IN THE WORLD, WITH DIFFERENT LAWS. IT IS IMPOSSIBLE TO VERIFY EVERY COUNTRIES&#x27;</span> LAWS, REGULATIONS AND CIVIL RIGHTS TO MAKE THE SOFTWARE COMPLY WITH ALL COUNTRIES<span class="hljs-string">&#x27; LAWS BY THE PROJECT. EVEN IF YOU WILL BE SUED BY A PRIVATE ENTITY OR BE DAMAGED BY A PUBLIC SERVANT IN YOUR COUNTRY, THE DEVELOPERS OF THIS SOFTWARE WILL NEVER BE LIABLE TO RECOVER OR COMPENSATE SUCH DAMAGES, CRIMINAL OR CIVIL</span><br><span class="hljs-string">RESPONSIBILITIES. NOTE THAT THIS LINE IS NOT LICENSE RESTRICTION BUT JUST A STATEMENT FOR WARNING AND DISCLAIMER.</span><br><span class="hljs-string"></span><br><span class="hljs-string">READ AND UNDERSTAND THE &#x27;</span>src/WARNING.TXT<span class="hljs-string">&#x27; FILE BEFORE USING THIS SOFTWARE. SOME SOFTWARE PROGRAMS FROM THIRD PARTIES ARE INCLUDED ON THIS SOFTWARE WITH LICENSE CONDITIONS WHICH ARE DESCRIBED ON THE &#x27;</span>src/THIRD_PARTY.TXT<span class="hljs-string">&#x27; FILE.</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">--------------------------------------------------------------------</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">Preparing SoftEther VPN Server...</span><br><span class="hljs-string">ranlib lib/libcharset.a</span><br><span class="hljs-string">ranlib lib/libcrypto.a</span><br><span class="hljs-string">ranlib lib/libedit.a</span><br><span class="hljs-string">ranlib lib/libiconv.a</span><br><span class="hljs-string">ranlib lib/libintelaes.a</span><br><span class="hljs-string">ranlib lib/libncurses.a</span><br><span class="hljs-string">ranlib lib/libssl.a</span><br><span class="hljs-string">ranlib lib/libz.a</span><br><span class="hljs-string">ranlib code/vpnserver.a</span><br><span class="hljs-string">gcc code/vpnserver.a -fPIE -O2 -fsigned-char -pthread -m64 -lm -lrt -lpthread -L./ lib/libssl.a lib/libcrypto.a lib/libiconv.a lib/libcharset.a lib/libedit.a lib/libncurses.a lib/libz.a lib/libintelaes.a -ldl -o vpnserver</span><br><span class="hljs-string">ranlib code/vpncmd.a</span><br><span class="hljs-string">gcc code/vpncmd.a -fPIE -O2 -fsigned-char -pthread -m64 -lm -lrt -lpthread -L./ lib/libssl.a lib/libcrypto.a lib/libiconv.a lib/libcharset.a lib/libedit.a lib/libncurses.a lib/libz.a lib/libintelaes.a -ldl -o vpncmd</span><br><span class="hljs-string">./vpncmd /tool /cmd:Check</span><br><span class="hljs-string">vpncmd command - SoftEther VPN Command Line Management Utility</span><br><span class="hljs-string">SoftEther VPN Command Line Management Utility (vpncmd command)</span><br><span class="hljs-string">Version 4.39 Build 9772   (English)</span><br><span class="hljs-string">Compiled 2022/04/26 18:00:50 by buildsan at crosswin</span><br><span class="hljs-string">Copyright (c) SoftEther VPN Project. All Rights Reserved.</span><br><span class="hljs-string"></span><br><span class="hljs-string">VPN Tools has been launched. By inputting HELP, you can view a list of the commands that can be used.</span><br><span class="hljs-string"></span><br><span class="hljs-string">VPN Tools&gt;Check</span><br><span class="hljs-string">Check command - Check whether SoftEther VPN Operation is Possible</span><br><span class="hljs-string">---------------------------------------------------</span><br><span class="hljs-string">SoftEther VPN Operation Environment Check Tool</span><br><span class="hljs-string"></span><br><span class="hljs-string">Copyright (c) SoftEther VPN Project.</span><br><span class="hljs-string">All Rights Reserved.</span><br><span class="hljs-string"></span><br><span class="hljs-string">If this operation environment check tool is run on a system and that system passes, it is most likely that SoftEther VPN software can operate on that system. This check may take a while. Please wait...</span><br><span class="hljs-string"></span><br><span class="hljs-string">Checking &#x27;</span>Kernel System<span class="hljs-string">&#x27;... </span><br><span class="hljs-string">              Pass</span><br><span class="hljs-string">Checking &#x27;</span>Memory Operation System<span class="hljs-string">&#x27;... </span><br><span class="hljs-string">              Pass</span><br><span class="hljs-string">Checking &#x27;</span>ANSI / Unicode string processing system<span class="hljs-string">&#x27;... </span><br><span class="hljs-string">              Pass</span><br><span class="hljs-string">Checking &#x27;</span>File system<span class="hljs-string">&#x27;... </span><br><span class="hljs-string">              Pass</span><br><span class="hljs-string">Checking &#x27;</span>Thread processing system<span class="hljs-string">&#x27;... </span><br><span class="hljs-string">              Pass</span><br><span class="hljs-string">Checking &#x27;</span>Network system<span class="hljs-string">&#x27;... </span><br><span class="hljs-string">              Pass</span><br><span class="hljs-string"></span><br><span class="hljs-string">All checks passed. It is most likely that SoftEther VPN Server / Bridge can operate normally on this system.</span><br><span class="hljs-string"></span><br><span class="hljs-string">The command completed successfully.</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">--------------------------------------------------------------------</span><br><span class="hljs-string">The preparation of SoftEther VPN Server is completed !</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">*** How to switch the display language of the SoftEther VPN Server Service ***</span><br><span class="hljs-string">SoftEther VPN Server supports the following languages:</span><br><span class="hljs-string">  - Japanese</span><br><span class="hljs-string">  - English</span><br><span class="hljs-string">  - Simplified Chinese</span><br><span class="hljs-string"></span><br><span class="hljs-string">You can choose your prefered language of SoftEther VPN Server at any time.</span><br><span class="hljs-string">To switch the current language, open and edit the &#x27;</span>lang.config<span class="hljs-string">&#x27; file.</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">Note: the administrative password is not set on the VPN Server. Please set your own administrative password as soon as possible by vpncmd or the GUI manager.</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">*** How to start the SoftEther VPN Server Service ***</span><br><span class="hljs-string"></span><br><span class="hljs-string">Please execute &#x27;</span>./vpnserver start<span class="hljs-string">&#x27; to run the SoftEther VPN Server Background Service.</span><br><span class="hljs-string">And please execute &#x27;</span>./vpncmd<span class="hljs-string">&#x27; to run the SoftEther VPN Command-Line Utility to configure SoftEther VPN Server.</span><br><span class="hljs-string"></span><br><span class="hljs-string">Of course, you can use the VPN Server Manager GUI Application for Windows / Mac OS X on the other Windows / Mac OS X computers in order to configure the SoftEther VPN Server remotely.</span><br><span class="hljs-string"></span><br><span class="hljs-string">*** For Windows users ***</span><br><span class="hljs-string">You can download the SoftEther VPN Server Manager for Windows</span><br><span class="hljs-string">from the http://www.softether-download.com/ web site.</span><br><span class="hljs-string">This manager application helps you to completely and easily manage the VPN server services running in remote hosts.</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">*** For Mac OS X users ***</span><br><span class="hljs-string">In April 2016 we released the SoftEther VPN Server Manager for Mac OS X.</span><br><span class="hljs-string">You can download it from the http://www.softether-download.com/ web site.</span><br><span class="hljs-string">VPN Server Manager for Mac OS X works perfectly as same as the traditional Windows versions. It helps you to completely and easily manage the VPN server services running in remote hosts.</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">*** PacketiX VPN Server HTML5 Web Administration Console (NEW) ***</span><br><span class="hljs-string">This VPN Server / Bridge has the built-in HTML5 Web Administration Console.</span><br><span class="hljs-string"></span><br><span class="hljs-string">After you start the server daemon, you can open the HTML5 Web Administration Console is available at</span><br><span class="hljs-string"></span><br><span class="hljs-string">https://127.0.0.1:5555/</span><br><span class="hljs-string">or</span><br><span class="hljs-string">https://ip_address_of_the_vpn_server:5555/</span><br><span class="hljs-string"></span><br><span class="hljs-string">This HTML5 page is obviously under construction, and your HTML5 development contribution is very appreciated.</span><br><span class="hljs-string"></span><br><span class="hljs-string">--------------------------------------------------------------------</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="创建启动程序"><a href="#创建启动程序" class="headerlink" title="创建启动程序"></a>创建启动程序</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim //usr/lib/systemd/system/vpnserver.service<br>[Unit]<br>Description=SoftEther VPN Server<br>After=network.target<br><br>[Service]<br>Type=forking<br>ExecStart=/usr/local/vpnserver/vpnserver start<br>ExecStop=/usr/local/vpnserver/vpnserver stop<br><br>[Install]<br>WantedBy=multi-user.target<br><br>systemctl daemon-reload<br><br><span class="hljs-comment"># 启动vpnserver服务</span><br><br>systemctl start vpnserver<br>systemctl status vpnserver<br>● vpnserver.service - SoftEther VPN Server<br>   Loaded: loaded (/usr/lib/systemd/system/vpnserver.service; disabled; vendor preset: disabled)<br>   Active: active (running) since Mon 2022-08-22 21:53:01 CST; 1min 57s ago<br>  Process: 17066 ExecStart=/usr/local/vpnserver/vpnserver start (code=exited, status=0/SUCCESS)<br> Main PID: 17070 (vpnserver)<br>   CGroup: /system.slice/vpnserver.service<br>           ├─17070 /usr/local/vpnserver/vpnserver execsvc<br>           └─17102 /usr/local/vpnserver/vpnserver execsvc<br><br>Aug 22 21:53:01 haproxy-node-a systemd[1]: Starting SoftEther VPN Server...<br>Aug 22 21:53:01 haproxy-node-a vpnserver[17066]: The SoftEther VPN Server service has been started.<br>Aug 22 21:53:01 haproxy-node-a vpnserver[17066]: Let<span class="hljs-string">&#x27;s get started by accessing to the following URL from your PC:</span><br><span class="hljs-string">Aug 22 21:53:01 haproxy-node-a vpnserver[17066]: https://192.168.10.81:5555/</span><br><span class="hljs-string">Aug 22 21:53:01 haproxy-node-a vpnserver[17066]: or</span><br><span class="hljs-string">Aug 22 21:53:01 haproxy-node-a vpnserver[17066]: https://192.168.10.81/</span><br><span class="hljs-string">Aug 22 21:53:01 haproxy-node-a vpnserver[17066]: Note: IP address may vary. Specify your server&#x27;</span>s IP address.<br>Aug 22 21:53:01 haproxy-node-a vpnserver[17066]: A TLS certificate warning will appear because the server uses self signed certificate...arning.<br>Aug 22 21:53:01 haproxy-node-a systemd[1]: Started SoftEther VPN Server.<br>Hint: Some lines were ellipsized, use -l to show <span class="hljs-keyword">in</span> full.<br></code></pre></td></tr></table></figure>
+<h3 id="防火墙放通服务"><a href="#防火墙放通服务" class="headerlink" title="防火墙放通服务"></a>防火墙放通服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">firewall-cmd --permanent --add-service=http<br>firewall-cmd --permanent --add-service=https<br>firewall-cmd --permanent --add-port=5555/tcp<br>firewall-cmd --complete-reload<br></code></pre></td></tr></table></figure>
+
+<h3 id="更改语言"><a href="#更改语言" class="headerlink" title="更改语言"></a>更改语言</h3><p>softether安装目录中有一个lang.config文件。将配置更改为cn。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim lang.config<br><span class="hljs-comment"># PacketiX VPN / SoftEther VPN Language Setting File</span><br><span class="hljs-comment"># </span><br><span class="hljs-comment"># Specify your preferred Language ID on this setting file.</span><br><span class="hljs-comment"># The text messages will be displayed in the specified language.</span><br><span class="hljs-comment"># </span><br><span class="hljs-comment"># Please note that you must restart a program to apply the modification of</span><br><span class="hljs-comment"># this setting-file.</span><br><span class="hljs-comment"># </span><br><span class="hljs-comment"># Only one line is acceptable. Any other lines are ignored.</span><br><span class="hljs-comment"># </span><br><span class="hljs-comment"># The change of this file will effect after the next execution of a program.</span><br><span class="hljs-comment"># </span><br><span class="hljs-comment"># Note for UNIX / Linux Users:</span><br><span class="hljs-comment">#  You have to set the LANG environment variable if you want to display</span><br><span class="hljs-comment">#  non-English characters. If no LANG environment is set, any multi-byte</span><br><span class="hljs-comment">#  characters (i.e. Japanese or Chinese) will not be displayed correctly.</span><br><span class="hljs-comment"># </span><br><span class="hljs-comment"># Available Language IDs are:</span><br><span class="hljs-comment">#  ja: Japanese (日本語)</span><br><span class="hljs-comment">#  en: English (English)</span><br><span class="hljs-comment">#  cn: Simplified Chinese (简体中文)</span><br><br><br><span class="hljs-comment"># Specify a Language ID here.</span><br>cn<br></code></pre></td></tr></table></figure>
+
+<h3 id="vpncmd配置"><a href="#vpncmd配置" class="headerlink" title="vpncmd配置"></a>vpncmd配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs bash">./vpncmd <br>vpncmd 命令 - SoftEther VPN 命令行管理工具<br>SoftEther VPN 命令行管理工具 (vpncmd 命令)<br>Version 4.39 Build 9772   (Simplified_Chinese)<br>Compiled 2022/04/26 18:00:50 by buildsan at crosswin<br>Copyright (c) SoftEther VPN Project. All Rights Reserved.<br><br>通过使用 vpncmd 程序，可以取得以下成果。<br><br>1. VPN Server 或 VPN Bridge 的管理。<br>2. VPN Client 的管理。<br>3. 使用 VPN 工具 (证书创建和网络传输速度测试工具)<br><br>选择 1, 2 或 3: 1<br><br>指定的主机名或目标 VPN Server 或 VPN Bridge 正在 运行的计算机 IP 地址。<br>通过以 <span class="hljs-string">&quot;主机名:端口号&quot;</span> 格式指定，您还可以指定端口号。<br>(当没有指定端口号时，使用 443。)<br>如果不输入任何内容并按下回车键，将连接到端口号为 443 的本地主机 (这台电脑)。<br>目标 IP 地址的主机名:<br><br>如果通过虚拟 HUB 管理模式连接到服务器，请输入虚拟 HUB 的名称。<br>如果通过服务器管理模式连接，无须输入任何内容请按回车键。<br>指定虚拟 HUB 名称:<br>与服务器 <span class="hljs-string">&quot;localhost&quot;</span> 的连接已建立 (端口 443)。<br><br>您有整个 VPN Server 的管理员权限。<br></code></pre></td></tr></table></figure>
+
+<h3 id="Softether服务对外映射"><a href="#Softether服务对外映射" class="headerlink" title="Softether服务对外映射"></a>Softether服务对外映射</h3><p>在公网出口设备上映射softether对应的服务端口。</p>
+<h3 id="服务器管理"><a href="#服务器管理" class="headerlink" title="服务器管理"></a>服务器管理</h3><p>从官网上下载服务器管理软件。下载<a target="_blank" rel="noopener" href="http://softether.fishinfo.cn/cn.aspx">链接</a>。管理工具含有windows和mac os的程序。<br>下载完成后，安装管理程序。下载和安装程序的过程略过，以下开始通过管理工具配置。</p>
+<p>打开server配置工具。<br>新建连接。连接的服务器为上面配置的服务器。本实例192.168.10.81。<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool.jpg" srcset="/img/loading.gif" lazyload alt="manager tool.jpg"><br>连接后，需要配置管理员密码，见下图：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-2.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-2.jpg"><br>接着按配置向导操作，比如提供员工远程访问的，或配置对等网络，本例选择远程访问：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-3.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-3.jpg"><br>确认初始化server服务：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-4.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-4.jpg"><br>创建服务器的HUB，可以按公司或组织名命令，后面连接配置会用到：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-5.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-5.jpg"><br>动态DNS配置，默认或看需求更改：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-6.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-6.jpg"><br>服务配置好了：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-7.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-7.jpg"><br>配置登录用的用户名和密码：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-8.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-8.jpg"><br>新建用户：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-9.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-9.jpg"><br>配置用户属性，通过，本实例选择用户密码认证：<br><img src="https://blog.ywmy.xyz/softether%2Fmanager%20tool-10.jpg" srcset="/img/loading.gif" lazyload alt="manager tool-10.jpg"></p>
+<blockquote>
+<p>特别说明在HUB管理员面，除了配置认证外，还需要配置虚拟NAT和虚拟DHCP服务器，启用SecureNAT。配置完成后，才可以实现NAT转发，和softether客户端DHCP分配。才可以连通softether路由可达的内网。</p>
+</blockquote>
+<h3 id="客户端连接"><a href="#客户端连接" class="headerlink" title="客户端连接"></a>客户端连接</h3><p>从官方网站下载softether客户端，安装过程略，启动客户端程序。</p>
+<p>创建新的连接：<br><img src="https://blog.ywmy.xyz/softether%2Fsoftether-client-tool.jpg" srcset="/img/loading.gif" lazyload alt="softether-client-tool.jpg"><br>配置服务器连接信息：<br><img src="https://blog.ywmy.xyz/softether%2Fsoftether-client-tool-1.jpg" srcset="/img/loading.gif" lazyload alt="softether-client-tool-1.jpg"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/security/">#security</a>
+      
+        <a href="/tags/vpn/">#vpn</a>
+      
+        <a href="/tags/softether/">#softether</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CentOS 部署 softether服务</div>
+      <div>https://ywmy.xyz/2022/08/22/CentOS-部署-softether服务/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年8月22日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/16/CentOS-7-RAID%E9%85%8D%E7%BD%AE/" title="CentOS 7 RAID配置">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CentOS 7 RAID配置</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/08/19/CentOS-7-keepalived%E9%83%A8%E7%BD%B2/" title="CentOS 7 keepalived部署">
+                        <span class="hidden-mobile">CentOS 7 keepalived部署</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

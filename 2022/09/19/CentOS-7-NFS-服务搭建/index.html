@@ -1,0 +1,816 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="CentOS 7 NFS 服务搭建NFS是Network File System的缩写，即网络文件系统。客户端通过挂载的方式将NFS服务器端共享的数据目录挂载到本地目录下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 7 NFS 服务搭建">
+<meta property="og:url" content="https://ywmy.xyz/2022/09/19/CentOS-7-NFS-%E6%9C%8D%E5%8A%A1%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="CentOS 7 NFS 服务搭建NFS是Network File System的缩写，即网络文件系统。客户端通过挂载的方式将NFS服务器端共享的数据目录挂载到本地目录下。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2022-09-19T04:15:05.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.653Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="nfs">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>CentOS 7 NFS 服务搭建 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CentOS 7 NFS 服务搭建"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-19 12:15" pubdate>
+          2022年9月19日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CentOS 7 NFS 服务搭建</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="CentOS-7-NFS-服务搭建"><a href="#CentOS-7-NFS-服务搭建" class="headerlink" title="CentOS 7 NFS 服务搭建"></a>CentOS 7 NFS 服务搭建</h1><p>NFS是Network File System的缩写，即网络文件系统。客户端通过挂载的方式将NFS服务器端共享的数据目录挂载到本地目录下。</p>
+<span id="more"></span>
+
+<p>在NFS的应用中，本地NFS的客户端应用可以透明地读写位于远端NFS服务器上的文件，就像访问本地文件一样。</p>
+<h2 id="NFS工作原理"><a href="#NFS工作原理" class="headerlink" title="NFS工作原理"></a>NFS工作原理</h2><p>1、首先NFS服务器端开启rpcbind;<br>2、然后服务端开启NFS服务,这时NFS的各项功能都需要向PRC服务注册,这RPC会通知portmap模块将可用的端口分配给statd, rquotad进程等;<br>3、然后NFS客户端RPC服务就会通过网络向NFS服务端的RPC服务的111端口发送NFS文件存取功能的询问请求;<br>4、NFS服务端的RPC服务找到对应的已注册的NFS daemon端口后,通知NFS客户端的PRC服务;<br>5、此时NFS客户端就可以获取到nfs服务端各个进程的正确端口,然后通过客户端的rpc就直接与NFS服务器的rpc进行存取数据了(rpc知道了nfs的具体端口,就可以实现远程调用,即传输)</p>
+<div class="note note-info">
+            <p>有一点需要注意的是nfs并不是单独存在的,而是由NFS-Servr,RPC,PORTMAP这三个模拟组成的。NFS-server只负责将数据通过以文质系统的方式共享出去，并进行登录管理和权限管理，并不负责数据的传输，而数据的传输则由RPC来完成。<br>PORTMAP主要是用来分配端口给statd,rquotad等进程的，NFS服务除了启动nfsd本身监控的端口2049&#x2F;tcp和2049&#x2F;udp，还会启动以上进程来完成文件共享。</p>
+          </div>
+
+<h2 id="NFS安装部署"><a href="#NFS安装部署" class="headerlink" title="NFS安装部署"></a>NFS安装部署</h2><h3 id="安装NFS服务"><a href="#安装NFS服务" class="headerlink" title="安装NFS服务"></a>安装NFS服务</h3><p>服务器端和客户端同时安装nfs-utils。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install nfs-utils<br></code></pre></td></tr></table></figure>
+
+<h3 id="启动NFS相关服务"><a href="#启动NFS相关服务" class="headerlink" title="启动NFS相关服务"></a>启动NFS相关服务</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl start rpcbind<br>systemctl start nfs<br>systemctl <span class="hljs-built_in">enable</span> rpcbind<br>systemctl <span class="hljs-built_in">enable</span> nfs<br></code></pre></td></tr></table></figure>
+
+<h3 id="查看rpc注册端口信息"><a href="#查看rpc注册端口信息" class="headerlink" title="查看rpc注册端口信息"></a>查看rpc注册端口信息</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># rpcinfo -p localhost</span><br>   program vers proto   port  service<br>    100000    4   tcp    111  portmapper<br>    100000    3   tcp    111  portmapper<br>    100000    2   tcp    111  portmapper<br>    100000    4   udp    111  portmapper<br>    100000    3   udp    111  portmapper<br>    100000    2   udp    111  portmapper<br>    100005    1   udp  20048  mountd<br>    100005    1   tcp  20048  mountd<br>    100005    2   udp  20048  mountd<br>    100005    2   tcp  20048  mountd<br>    100005    3   udp  20048  mountd<br>    100005    3   tcp  20048  mountd<br>    100003    3   tcp   2049  nfs<br>    100003    4   tcp   2049  nfs<br>    100227    3   tcp   2049  nfs_acl<br>    100003    3   udp   2049  nfs<br>    100003    4   udp   2049  nfs<br>    100227    3   udp   2049  nfs_acl<br>    100021    1   udp  49132  nlockmgr<br>    100021    3   udp  49132  nlockmgr<br>    100021    4   udp  49132  nlockmgr<br>    100021    1   tcp  40709  nlockmgr<br>    100021    3   tcp  40709  nlockmgr<br>    100021    4   tcp  40709  nlockmgr<br></code></pre></td></tr></table></figure>
+
+<h3 id="创建挂载的目录"><a href="#创建挂载的目录" class="headerlink" title="创建挂载的目录"></a>创建挂载的目录</h3><p>例如在home目录下创建share作为内网挂载的目录，可以按下面操作。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /home<br><span class="hljs-built_in">mkdir</span> share<br><span class="hljs-built_in">chown</span> nfsnobody.nfsnobody ./share<br></code></pre></td></tr></table></figure>
+
+<p>将挂载信息写入配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># cat /etc/exports</span><br>/home/share 192.168.10.0/24(rw,<span class="hljs-built_in">sync</span>)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<p>export 文件配置格式参考上面配置，NFS共享目录+NFS客户端1（参数1，参数2…）+NFS客户端2（参数1，参数2…）+…</p>
+<div class="note note-info">
+            <p>NFS共享目录要用绝对目录，可以被nfsnobody读写。</p>
+          </div>
+
+<p>NFS客户端地址：</p>
+<div class="note note-info">
+            <p>指定IP：192.168.0.1<br>指定子网所有主机：192.168.0.0&#x2F;24<br>指定域名的主机：abc.com<br>指定域名的所有主机：*.abc.com<br>所有主机：*</p>
+          </div>
+
+<p>参数：</p>
+<ul>
+<li>ro：目录只读</li>
+<li>rw：目录读写</li>
+<li>sync：将数据同步写入内存缓冲区与磁盘中，效率低，但可以保证数据的一致性</li>
+<li>async：将数据先保存在内存缓冲区，必要时才写入磁盘</li>
+<li>all_squash：将远程访问的所有普通用户及所属组映射为匿名用户或用户组(nfsnobody)</li>
+<li>no_all_squash：与all_squash取反（默认设置）</li>
+<li>root_squash：将root用户及所属的组都映射为匿名用户组（默认设置）</li>
+<li>no_root_squash：与root_squash取反</li>
+<li>anonuid&#x3D;xxx：将远程访问的所有用户都映射为匿名用户，并指定该用户为本地用户（UID&#x3D;XXX）</li>
+<li>anongid&#x3D;xxx：将远程访问的所有用户都映射为匿名用户组账户</li>
+</ul>
+<p>重新加载nfs配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># exportfs -rv</span><br>exporting 192.168.10.0/24:/home/share<br></code></pre></td></tr></table></figure>
+
+<h3 id="防火墙配置"><a href="#防火墙配置" class="headerlink" title="防火墙配置"></a>防火墙配置</h3><p>防火墙上需要放通nfs,rpc-bind,mountd三个服务。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">firewall-cmd --permanent --add-service=nfs<br>firewall-cmd --permanent --add-service=rpc-bind<br>firewall-cmd --permanent --add-service=mountd<br>firewall-cmd --complete-reload<br></code></pre></td></tr></table></figure>
+
+<p>查看服务器本机的挂情况：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-a ~]<span class="hljs-comment"># showmount -e localhost</span><br>Export list <span class="hljs-keyword">for</span> localhost:<br>/home/share 192.168.10.0/24<br></code></pre></td></tr></table></figure>
+
+<h3 id="挂载测试"><a href="#挂载测试" class="headerlink" title="挂载测试"></a>挂载测试</h3><p>在客户端上创建目录，并挂NFS共享目录，比如在home目录下创建nfs目录，用于挂载服务器上的nfs共享。</p>
+<p>1、客户端上安装nfs服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install nfs-utils<br></code></pre></td></tr></table></figure>
+
+<p>2、客户端上测试nfs挂载</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b ~]<span class="hljs-comment"># showmount -e 192.168.10.81</span><br>Export list <span class="hljs-keyword">for</span> 192.168.10.81:<br>/home/share 192.168.10.0/24<br></code></pre></td></tr></table></figure>
+
+<p>3、创建目录并挂载NFS</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> /home<br>mkdri nfs<br>mount -t nfs 192.168.10.81:/home/share /home/nfs<br></code></pre></td></tr></table></figure>
+
+<p>4、查看挂载后的目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b ~]<span class="hljs-comment"># df -hT</span><br>Filesystem                Type      Size  Used Avail Use% Mounted on<br>devtmpfs                  devtmpfs  874M     0  874M   0% /dev<br>tmpfs                     tmpfs     886M  180K  885M   1% /dev/shm<br>tmpfs                     tmpfs     886M   17M  869M   2% /run<br>tmpfs                     tmpfs     886M     0  886M   0% /sys/fs/cgroup<br>/dev/mapper/centos-root   xfs        47G  2.1G   45G   5% /<br>/dev/vda1                 xfs      1014M  186M  829M  19% /boot<br>192.168.10.81:/home/share nfs4       80G   34M   80G   1% /home/nfs             <span class="hljs-comment"># 已经挂载了NFS目录</span><br>tmpfs                     tmpfs     382M     0  382M   0% /run/user/0<br></code></pre></td></tr></table></figure>
+
+<p>5、挂载持久化</p>
+<div class="note note-warning">
+            <p>需要将挂载信息写入fstab，挂久生效，否则挂的目录，会在重启后失效。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@haproxy-node-b ~]<span class="hljs-comment"># cat /etc/fstab </span><br><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># /etc/fstab</span><br><span class="hljs-comment"># Created by anaconda on Fri Aug 19 11:48:24 2022</span><br><span class="hljs-comment">#</span><br><span class="hljs-comment"># Accessible filesystems, by reference, are maintained under &#x27;/dev/disk&#x27;</span><br><span class="hljs-comment"># See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info</span><br><span class="hljs-comment">#</span><br>/dev/mapper/centos-root /                       xfs     defaults        0 0<br>UUID=d8d7facd-702b-4b24-889e-ab62a41dc5e9 /boot                   xfs     defaults        0 0<br>/dev/mapper/centos-swap swap                    swap    defaults        0 0<br>192.168.10.81:/home/share       /home/nfs       nfs     defaults        0 0<br></code></pre></td></tr></table></figure>
+
+<p>完成挂后，服务器上的nfs即同本地硬盘一样，对nfs文件系统的操作权限，参考nfs配置中的各个参数说明。</p>
+<h3 id="动态挂截nfs目录"><a href="#动态挂截nfs目录" class="headerlink" title="动态挂截nfs目录"></a>动态挂截nfs目录</h3><blockquote>
+<p>autofs 是一个可根据需要自动装入指定目录的程序。它基于一个内核模块运行以实现高效率，并且可以同时管理本地目录和网络共享。这些自动安装点仅会在被访问时装入，一定时间内不活动后即会被卸载。这种按需行为可节省带宽，并实现比 &#x2F;etc&#x2F;fstab 管理的静态装入更高的性能。虽然 autofs 是控制脚本，但 automount 才是实际执行自动装入的命令（守护程序）。</p>
+</blockquote>
+<blockquote>
+<p>Autofs与Mount&#x2F;Umount的不同之处在于，它是一种看守程序。如果它检测到用户正试图访问一个尚未挂接的文件系统，它就会自动检测该文件系统，如果存在，那么Autofs会自动将其挂接。另一方面， 如果它检测到某个已挂接的文件系统在一段时间内没有被使用，那么Autofs会自动将其卸载。因此一旦运行了Autofs后，用户就不再需要手动完成文件系统的挂接和卸载。</p>
+</blockquote>
+<h4 id="安装autofs"><a href="#安装autofs" class="headerlink" title="安装autofs"></a>安装autofs</h4><p>在需要动态挂载的客户端上安装autofs。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install autofs<br></code></pre></td></tr></table></figure>
+
+<h4 id="配置自动挂载"><a href="#配置自动挂载" class="headerlink" title="配置自动挂载"></a>配置自动挂载</h4><p>1、编辑autofa映射文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/auto.master<br><span class="hljs-comment"># 在末尾追加配置</span><br><br>/home   /etc/auto.nfs   --<span class="hljs-built_in">timeout</span>=10<br></code></pre></td></tr></table></figure>
+<p>挂载目录为&#x2F;home下，NFS共享在&#x2F;etc&#x2F;auto.nfs映射中指定，共享在10秒不流动后自动卸载。</p>
+<p>2、为NFS创建映射文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/auto.nfs<br><span class="hljs-comment"># 添加映射文件配置</span><br>[root@node71 etc]<span class="hljs-comment"># cat /etc/auto.nfs</span><br>nfs     192.168.10.81:/home/share<br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p>如果之前有在fstab中添加了挂截信息，需要将&#x2F;etc&#x2F;fstab中相关配置注释掉。</p>
+          </div>
+
+<p>4、重新挂载autofs并检查是否正常</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@node71 etc]<span class="hljs-comment"># systemctl restart autofs</span><br>[root@node71 etc]<span class="hljs-comment"># systemctl status autofs</span><br>● autofs.service - Automounts filesystems on demand<br>   Loaded: loaded (/usr/lib/systemd/system/autofs.service; disabled; vendor preset: disabled)<br>   Active: active (running) since Thu 2022-09-22 13:35:39 CST; 4s ago<br> Main PID: 8468 (automount)<br>   CGroup: /system.slice/autofs.service<br>           └─8468 /usr/sbin/automount --systemd-service --dont-check-daemon<br><br>Sep 22 13:35:39 node71 systemd[1]: Starting Automounts filesystems on demand...<br>Sep 22 13:35:39 node71 systemd[1]: Started Automounts filesystems on demand.<br><br>[root@node71 home]<span class="hljs-comment"># ls -l /home/nfs</span><br>total 0<br>drwxr-xr-x 2 nfsnobody nfsnobody 22 Sep 19 12:11 <span class="hljs-built_in">test</span><br>[root@node71 home]<span class="hljs-comment"># df -hT</span><br>Filesystem              Type      Size  Used Avail Use% Mounted on<br>devtmpfs                devtmpfs  3.9G     0  3.9G   0% /dev<br>tmpfs                   tmpfs     3.9G  440K  3.9G   1% /dev/shm<br>tmpfs                   tmpfs     3.9G   17M  3.9G   1% /run<br>tmpfs                   tmpfs     3.9G     0  3.9G   0% /sys/fs/cgroup<br>/dev/mapper/centos-root xfs        48G  2.6G   46G   6% /<br>/dev/vda1               xfs      1014M  217M  798M  22% /boot<br>tmpfs                   tmpfs     782M     0  782M   0% /run/user/0<br><br>[root@node71 home]<span class="hljs-comment"># ls -al </span><br>total 0<br>drwxr-xr-x   2 root root   0 Sep 22 13:41 .<br>dr-xr-xr-x. 19 root root 247 Sep 22 13:40 ..<br>[root@node71 home]<span class="hljs-comment"># cd nfs          # 自动挂载nfs</span><br>[root@node71 nfs]<span class="hljs-comment"># ls -al </span><br>total 0<br>drwxr-xr-x 3 nfsnobody nfsnobody 18 Sep 19 12:10 .<br>drwxr-xr-x 3 root      root       0 Sep 22 13:43 ..<br>drwxr-xr-x 2 nfsnobody nfsnobody 22 Sep 19 12:11 <span class="hljs-built_in">test</span>   <span class="hljs-comment"># nfs目录中共享的测试目录</span><br>[root@node71 nfs]<span class="hljs-comment"># pwd</span><br>/home/nfs   <br>[root@node71 nfs]<span class="hljs-comment"># </span><br></code></pre></td></tr></table></figure>
+
+<p>挂载信息验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@node71 nfs]<span class="hljs-comment"># grep /home/ /proc/mounts </span><br>192.168.10.81:/home/share /home/nfs nfs4 rw,relatime,vers=4.1,rsize=524288,wsize=524288,namlen=255,hard,proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=192.168.10.71,local_lock=none,addr=192.168.10.81 0 0<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>至此NFS服务搭建，挂载，自动挂载相关的配置已经结束，文档参考<a class="btn" href="https://documentation.suse.com/zh-cn/sles/12-SP4/html/SLES-all/cha-autofs.html#sec-autofs-nfs"  title="suse 使用 Autofs 按需装入" target="_blank">suse 使用 Autofs 按需装入</a>。<br>NFS服务配置，也参考自<a class="btn" href="https://www.server-world.info/en/note?os=CentOS_Stream_8&p=nfs&f=1"  title="Configure NFS Server" target="_blank">Configure NFS Server</a></p>
+          </div>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/linux/">#linux</a>
+      
+        <a href="/tags/nfs/">#nfs</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CentOS 7 NFS 服务搭建</div>
+      <div>https://ywmy.xyz/2022/09/19/CentOS-7-NFS-服务搭建/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/22/%E4%BD%BF%E7%94%A8NFSv4-ACL%E8%BF%9B%E8%A1%8C%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/" title="使用NFSv4 ACL进行权限管理">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">使用NFSv4 ACL进行权限管理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/16/CentOS-7-RAID%E9%85%8D%E7%BD%AE%E7%BB%AD/" title="CentOS 7 RAID配置续">
+                        <span class="hidden-mobile">CentOS 7 RAID配置续</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

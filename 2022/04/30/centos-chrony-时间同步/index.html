@@ -1,0 +1,756 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="centos chrony 时间同步centos 时间同步，之前使用ntpdate，现在可以使用chrony从远程NTP服务器中获取正确的时间。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos chrony 时间同步">
+<meta property="og:url" content="https://ywmy.xyz/2022/04/30/centos-chrony-%E6%97%B6%E9%97%B4%E5%90%8C%E6%AD%A5/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="centos chrony 时间同步centos 时间同步，之前使用ntpdate，现在可以使用chrony从远程NTP服务器中获取正确的时间。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2022-04-30T02:42:07.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.657Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="centos">
+<meta property="article:tag" content="ntp">
+<meta property="article:tag" content="chrony">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>centos chrony 时间同步 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="centos chrony 时间同步"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-04-30 10:42" pubdate>
+          2022年4月30日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          76 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">centos chrony 时间同步</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="centos-chrony-时间同步"><a href="#centos-chrony-时间同步" class="headerlink" title="centos chrony 时间同步"></a>centos chrony 时间同步</h1><p>centos 时间同步，之前使用ntpdate，现在可以使用chrony从远程NTP服务器中获取正确的时间。</p>
+<span id="more"></span>
+
+<h2 id="安装chrony"><a href="#安装chrony" class="headerlink" title="安装chrony"></a>安装chrony</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install chrony<br></code></pre></td></tr></table></figure>
+
+<p>chrony 安装完成之后，会有两个可执行程序：<br><strong>chronyc</strong>：chrony命令行工具<br><strong>chronyd</strong>：chrony的守护进程</p>
+<h2 id="chron配置文件"><a href="#chron配置文件" class="headerlink" title="chron配置文件"></a>chron配置文件</h2><p>chrony的配置文件是&#x2F;etc&#x2F;chrony.conf，默认日志配置文件如下所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># Use public servers from the pool.ntp.org project.</span><br><span class="hljs-comment"># Please consider joining the pool (http://www.pool.ntp.org/join.html).</span><br>server 0.centos.pool.ntp.org iburst<br>server 1.centos.pool.ntp.org iburst<br>server 2.centos.pool.ntp.org iburst<br>server 3.centos.pool.ntp.org iburst<br><br><span class="hljs-comment"># Record the rate at which the system clock gains/losses time.</span><br>driftfile /var/lib/chrony/drift<br><br><span class="hljs-comment"># Allow the system clock to be stepped in the first three updates</span><br><span class="hljs-comment"># if its offset is larger than 1 second.</span><br>makestep 1.0 3<br><br><span class="hljs-comment"># Enable kernel synchronization of the real-time clock (RTC).</span><br>rtcsync<br><br><span class="hljs-comment"># Enable hardware timestamping on all interfaces that support it.</span><br><span class="hljs-comment">#hwtimestamp *</span><br><br><span class="hljs-comment"># Increase the minimum number of selectable sources required to adjust</span><br><span class="hljs-comment"># the system clock.</span><br><span class="hljs-comment">#minsources 2</span><br><br><span class="hljs-comment"># Allow NTP client access from local network.</span><br><span class="hljs-comment">#allow 192.168.0.0/16</span><br><br><span class="hljs-comment"># Serve time even if not synchronized to a time source.</span><br><span class="hljs-comment">#local stratum 10</span><br><br><span class="hljs-comment"># Specify file containing keys for NTP authentication.</span><br><span class="hljs-comment">#keyfile /etc/chrony.keys</span><br><br><span class="hljs-comment"># Specify directory for log files.</span><br>logdir /var/log/chrony<br><br><span class="hljs-comment"># Select which information is logged.</span><br><span class="hljs-comment">#log measurements statistics tracking</span><br></code></pre></td></tr></table></figure>
+
+<p><strong>server</strong> 开头的配置项为远程NTP服务器，chrony将从中获取时间的远程NTP服务器列表。</p>
+<p><strong>driftfile &#x2F;var&#x2F;lib&#x2F;chrony&#x2F;drift</strong> 存储校时误差，重启后，之前的计算结果也不会丢失。</p>
+<p><strong>keyfile &#x2F;etc&#x2F;chrony.keys</strong> 该文件包含用于NTP身份验证的密角。</p>
+<p><strong>logdir &#x2F;var&#x2F;log&#x2F;chrony</strong> chrony日志文件。</p>
+<h2 id="测试chrony"><a href="#测试chrony" class="headerlink" title="测试chrony"></a>测试chrony</h2><p>chronyd手动同步:</p>
+<p>语法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">chronyd -q <span class="hljs-string">&#x27;server &#123;ntp_server_name&#125; iburst&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@localhost ~]<span class="hljs-comment"># chronyd -q </span><br>2022-04-30T03:06:47Z chronyd version 3.4 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS +SECHASH +IPV6 +DEBUG)<br>2022-04-30T03:06:47Z Frequency 59.505 +/- 0.065 ppm <span class="hljs-built_in">read</span> from /var/lib/chrony/drift<br>2022-04-30T03:06:53Z System clock wrong by -0.006353 seconds (step)<br>2022-04-30T03:06:53Z chronyd exiting<br><br><span class="hljs-comment"># 指定NTP服务器</span><br><br>[root@localhost ~]<span class="hljs-comment"># chronyd -q &#x27;server cn.pool.ntp.org iburst&#x27;</span><br>2022-04-30T03:09:54Z chronyd version 3.4 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS +SECHASH +IPV6 +DEBUG)<br>2022-04-30T03:09:54Z Initial frequency 59.505 ppm<br>2022-04-30T03:09:59Z System clock wrong by -0.008810 seconds (step)<br>2022-04-30T03:09:59Z chronyd exiting<br></code></pre></td></tr></table></figure>
+
+<h2 id="启动chronyd服务"><a href="#启动chronyd服务" class="headerlink" title="启动chronyd服务"></a>启动chronyd服务</h2><p>使用systemctl管理chronyd服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl start chronyd<br>systemctl stop chronyd<br>systemctl restart chronyd<br>systemctn <span class="hljs-built_in">enable</span> chronyd <span class="hljs-comment"># 开机加载服务</span><br></code></pre></td></tr></table></figure>
+
+<p>查看chronyd运行状态：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl status chronyd<br>● chronyd.service - NTP client/server<br>   Loaded: loaded (/usr/lib/systemd/system/chronyd.service; enabled; vendor preset: enabled)<br>   Active: active (running) since 六 2022-04-30 11:12:34 CST; 1min 53s ago<br>     Docs: man:chronyd(8)<br>           man:chrony.conf(5)<br>  Process: 31623 ExecStartPost=/usr/libexec/chrony-helper update-daemon (code=exited, status=0/SUCCESS)<br>  Process: 31619 ExecStart=/usr/sbin/chronyd <span class="hljs-variable">$OPTIONS</span> (code=exited, status=0/SUCCESS)<br> Main PID: 31621 (chronyd)<br>   CGroup: /system.slice/chronyd.service<br>           └─31621 /usr/sbin/chronyd<br><br>4月 30 11:12:34 localhost systemd[1]: Starting NTP client/server...<br>4月 30 11:12:34 localhost chronyd[31621]: chronyd version 3.4 starting (+CMDMON +NTP +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +ASYNCDNS +SECHASH +IPV6 +DEBUG)<br>4月 30 11:12:34 localhost chronyd[31621]: Frequency 59.505 +/- 0.065 ppm <span class="hljs-built_in">read</span> from /var/lib/chrony/drift<br>4月 30 11:12:34 localhost systemd[1]: Started NTP client/server.<br>4月 30 11:12:40 localhost chronyd[31621]: Selected <span class="hljs-built_in">source</span> 162.159.200.123<br>4月 30 11:12:42 localhost chronyd[31621]: Selected <span class="hljs-built_in">source</span> 139.199.215.251<br>4月 30 11:12:43 localhost chronyd[31621]: Source 162.159.200.1 replaced with 219.216.128.25<br></code></pre></td></tr></table></figure>
+
+<p>##验证时间同步</p>
+<p>要验证系统时间是否已经使用chrony同步，可以使用下面命令查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@localhost ~]<span class="hljs-comment"># chronyc tracking</span><br>Reference ID    : 8BC7D7FB (139.199.215.251)<br>Stratum         : 3<br>Ref time (UTC)  : Sat Apr 30 03:26:44 2022<br>System time     : 0.000547036 seconds fast of NTP time<br>Last offset     : +0.000449545 seconds<br>RMS offset      : 0.018766215 seconds<br>Frequency       : 59.520 ppm fast<br>Residual freq   : +0.633 ppm<br>Skew            : 0.836 ppm<br>Root delay      : 0.035655029 seconds<br>Root dispersion : 0.012061744 seconds<br>Update interval : 64.6 seconds<br>Leap status     : Normal<br></code></pre></td></tr></table></figure>
+
+<p>##检查chrony源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@localhost ~]<span class="hljs-comment"># chronyc sources</span><br>210 Number of sources = 4<br>MS Name/IP address         Stratum Poll Reach LastRx Last sample               <br>===============================================================================<br>^- a.chl.la                      2   6   375   102  -3941us[-3490us] +/-  121ms<br>^- 219.216.128.25                2   6   377    41   +185us[ +185us] +/-   33ms<br>^* 139.199.215.251               2   6   363    41   +587us[+1038us] +/-   36ms<br>^- time.cloudflare.com           3   6   377    42    +20ms[  +21ms] +/-  139ms<br>````<br>列出有关chronyd使用的每个源的漂移速度和偏移会计信息，使用以下命令：<br>```bash<br>[root@localhost ~]<span class="hljs-comment"># chronyc sourcestats -v</span><br>210 Number of sources = 4<br>                             .- Number of sample points <span class="hljs-keyword">in</span> measurement <span class="hljs-built_in">set</span>.<br>                            /    .- Number of residual runs with same sign.<br>                           |    /    .- Length of measurement <span class="hljs-built_in">set</span> (time).<br>                           |   |    /      .- Est. clock freq error (ppm).<br>                           |   |   |      /           .- Est. error <span class="hljs-keyword">in</span> freq.<br>                           |   |   |     |           /         .- Est. offset.<br>                           |   |   |     |          |          |   On the -.<br>                           |   |   |     |          |          |   samples. \<br>                           |   |   |     |          |          |             |<br>Name/IP Address            NP  NR  Span  Frequency  Freq Skew  Offset  Std Dev<br>==============================================================================<br>a.chl.la                   16   8  1050     -5.377     28.428    -19ms  8400us<br>219.216.128.25             18   8  1103     +0.066      3.771  +1629us  1220us<br>139.199.215.251            19  12  1175     +0.159      3.621  +1261ns  1523us<br>time.cloudflare.com        17   9  1109     +1.413      4.761  +3001us  1534us<br></code></pre></td></tr></table></figure>
+
+<h2 id="配置chrony-NTP服务"><a href="#配置chrony-NTP服务" class="headerlink" title="配置chrony NTP服务"></a>配置chrony NTP服务</h2><p>如果要将linux服务器配置为所有内部系统的Chronyc NTP服务器，需要修改配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">sed -i <span class="hljs-string">&quot;s/#local stratum 10/local stratum 10/g&quot;</span> /etc/chrony.conf<br>sed -i <span class="hljs-string">&quot;s/#allow 192.168.0.0/16/allow 192.168.0.0/16/g&quot;</span> /etc/chrony.conf<br></code></pre></td></tr></table></figure>
+
+<p>取消<strong>local stratum 10</strong>行注释时，使用linux服务器成为实时NTP服务器，无外部连网也可以继续工作。<br>取消<strong>allow 192.168.0.0&#x2F;16</strong>表示允许该网段的设备连接到chrony ntp 服务器进行时间同步。</p>
+<p>防火墙允许NTP服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">firewall-cmd --permanent --add-service=ntp<br>firewall-cmd --complete-reload<br></code></pre></td></tr></table></figure>
+
+<h2 id="chronyc-交互式命令"><a href="#chronyc-交互式命令" class="headerlink" title="chronyc 交互式命令"></a>chronyc 交互式命令</h2><p>命令行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@localhost ~]<span class="hljs-comment"># chronyc</span><br>chrony version 3.4<br>Copyright (C) 1997-2003, 2007, 2009-2018 Richard P. Curnow and others<br>chrony comes with ABSOLUTELY NO WARRANTY.  This is free software, and<br>you are welcome to redistribute it under certain conditions.  See the<br>GNU General Public License version 2 <span class="hljs-keyword">for</span> details.<br><br>chronyc&gt; <span class="hljs-built_in">help</span><br>System clock:               <br>tracking                    Display system time information<br>makestep                    Correct clock by stepping immediately<br>makestep &lt;threshold&gt; &lt;updates&gt;<br>                            Configure automatic clock stepping<br>maxupdateskew &lt;skew&gt;        Modify maximum valid skew to update frequency<br>waitsync [&lt;max-tries&gt; [&lt;max-correction&gt; [&lt;max-skew&gt; [&lt;interval&gt;]]]]<br>                            Wait until synchronised <span class="hljs-keyword">in</span> specified limits<br>                            <br>Time sources:               <br>sources [-v]                Display information about current sources<br>sourcestats [-v]            Display statistics about collected measurements<br>reselect                    Force reselecting synchronisation <span class="hljs-built_in">source</span><br>reselectdist &lt;dist&gt;         Modify reselection distance<br>                            <br>NTP sources:                <br>activity                    Check how many NTP sources are online/offline<br>ntpdata [&lt;address&gt;]         Display information about last valid measurement<br>add server &lt;address&gt; [options]<br>                            Add new NTP server<br>add peer &lt;address&gt; [options]<br>                            Add new NTP peer<br>delete &lt;address&gt;            Remove server or peer<br>burst &lt;n-good&gt;/&lt;n-max&gt; [&lt;mask&gt;/&lt;address&gt;]<br>                            Start rapid <span class="hljs-built_in">set</span> of measurements<br>maxdelay &lt;address&gt; &lt;delay&gt;  Modify maximum valid sample delay<br>maxdelayratio &lt;address&gt; &lt;ratio&gt;<br>                            Modify maximum valid delay/minimum ratio<br>maxdelaydevratio &lt;address&gt; &lt;ratio&gt;<br>                            Modify maximum valid delay/deviation ratio<br>minpoll &lt;address&gt; &lt;poll&gt;    Modify minimum polling interval<br>maxpoll &lt;address&gt; &lt;poll&gt;    Modify maximum polling interval<br>minstratum &lt;address&gt; &lt;stratum&gt;<br>                            Modify minimum stratum<br><br>offline [&lt;mask&gt;/&lt;address&gt;]  Set sources <span class="hljs-keyword">in</span> subnet to offline status<br>online [&lt;mask&gt;/&lt;address&gt;]   Set sources <span class="hljs-keyword">in</span> subnet to online status<br>onoffline                   Set all sources to online or offline status<br>                            according to network configuration<br>polltarget &lt;address&gt; &lt;target&gt;<br>                            Modify poll target<br>refresh                     Refresh IP addresses<br>                            <br>Manual time input:          <br>manual off|on|reset         Disable/enable/reset settime <span class="hljs-built_in">command</span><br>manual list                 Show previous settime entries<br>manual delete &lt;index&gt;       Delete previous settime entry<br>settime &lt;time&gt;              Set daemon time<br>                            (e.g. Sep 25, 2015 16:30:05 or 16:30:05)<br>                            <br>NTP access:                 <br>accheck &lt;address&gt;           Check whether address is allowed<br>clients                     Report on clients that have accessed the server<br>serverstats                 Display statistics of the server<br>allow [&lt;subnet&gt;]            Allow access to subnet as a default<br>allow all [&lt;subnet&gt;]        Allow access to subnet and all children<br>deny [&lt;subnet&gt;]             Deny access to subnet as a default<br>deny all [&lt;subnet&gt;]         Deny access to subnet and all children<br><span class="hljs-built_in">local</span> [options]             Serve time even when not synchronised<br><span class="hljs-built_in">local</span> off                   Don<span class="hljs-string">&#x27;t serve time when not synchronised</span><br><span class="hljs-string">smoothtime reset|activate   Reset/activate time smoothing</span><br><span class="hljs-string">smoothing                   Display current time smoothing state</span><br><span class="hljs-string">                            </span><br><span class="hljs-string">Monitoring access:          </span><br><span class="hljs-string">cmdaccheck &lt;address&gt;        Check whether address is allowed</span><br><span class="hljs-string">cmdallow [&lt;subnet&gt;]         Allow access to subnet as a default</span><br><span class="hljs-string">cmdallow all [&lt;subnet&gt;]     Allow access to subnet and all children</span><br><span class="hljs-string">cmddeny [&lt;subnet&gt;]          Deny access to subnet as a default</span><br><span class="hljs-string">cmddeny all [&lt;subnet&gt;]      Deny access to subnet and all children</span><br><span class="hljs-string">                            </span><br><span class="hljs-string">Real-time clock:            </span><br><span class="hljs-string">rtcdata                     Print current RTC performance parameters</span><br><span class="hljs-string">trimrtc                     Correct RTC relative to system clock</span><br><span class="hljs-string">writertc                    Save RTC performance parameters to file</span><br><span class="hljs-string">                            </span><br><span class="hljs-string">Other daemon commands:      </span><br><span class="hljs-string">cyclelogs                   Close and re-open log files</span><br><span class="hljs-string">dump                        Dump all measurements to save files</span><br><span class="hljs-string">rekey                       Re-read keys from key file</span><br><span class="hljs-string">shutdown                    Stop daemon</span><br><span class="hljs-string">                            </span><br><span class="hljs-string">Client commands:            </span><br><span class="hljs-string">dns -n|+n                   Disable/enable resolving IP addresses to hostnames</span><br><span class="hljs-string">dns -4|-6|-46               Resolve hostnames only to IPv4/IPv6/both addresses</span><br><span class="hljs-string">timeout &lt;milliseconds&gt;      Set initial response timeout</span><br><span class="hljs-string">retries &lt;retries&gt;           Set maximum number of retries</span><br><span class="hljs-string">keygen [&lt;id&gt; [&lt;type&gt; [&lt;bits&gt;]]]</span><br><span class="hljs-string">                            Generate key for key file</span><br><span class="hljs-string">exit|quit                   Leave the program</span><br><span class="hljs-string">help                        Generate this help</span><br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/linux/" class="category-chain-item">linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/centos/">#centos</a>
+      
+        <a href="/tags/ntp/">#ntp</a>
+      
+        <a href="/tags/chrony/">#chrony</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>centos chrony 时间同步</div>
+      <div>https://ywmy.xyz/2022/04/30/centos-chrony-时间同步/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年4月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/04/30/%E7%8C%9C%E6%95%B0%E5%AD%97/" title="猜数字">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">猜数字</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/04/22/ubuntu%E5%AE%89%E8%A3%85nodejs/" title="ubuntu安装nodejs">
+                        <span class="hidden-mobile">ubuntu安装nodejs</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>

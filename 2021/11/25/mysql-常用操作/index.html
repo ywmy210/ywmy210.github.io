@@ -1,0 +1,870 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://blog.ywmy.xyz/icno">
+  <link rel="icon" href="https://blog.ywmy.xyz/icno">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="ian">
+  <meta name="keywords" content="network">
+  
+    <meta name="description" content="mysql 常用操作记录一些mysql 基本操作的命令，这是少接触，怕用到的那一部分。有需要了，还得回这里看看，以备万一，哪天有时间了，也可以过来学学。这就样。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql 常用操作">
+<meta property="og:url" content="https://ywmy.xyz/2021/11/25/mysql-%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="豆豆家">
+<meta property="og:description" content="mysql 常用操作记录一些mysql 基本操作的命令，这是少接触，怕用到的那一部分。有需要了，还得回这里看看，以备万一，哪天有时间了，也可以过来学学。这就样。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+<meta property="article:published_time" content="2021-11-25T13:16:55.000Z">
+<meta property="article:modified_time" content="2023-02-08T06:34:48.749Z">
+<meta property="article:author" content="Ian &amp; Doudou">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://blog.ywmy.xyz/cover/linux.jpg">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>mysql 常用操作 - 豆豆家</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ywmy.xyz","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"BASH"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>豆豆家</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('https://blog.ywmy.xyz/cover/default.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="mysql 常用操作"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        ian
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-11-25 21:16" pubdate>
+          2021年11月25日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">mysql 常用操作</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="mysql-常用操作"><a href="#mysql-常用操作" class="headerlink" title="mysql 常用操作"></a>mysql 常用操作</h1><p>记录一些mysql 基本操作的命令，这是少接触，怕用到的那一部分。有需要了，还得回这里看看，以备万一，哪天有时间了，也可以过来学学。这就样。</p>
+<span id="more"></span>
+
+<h2 id="mysql基本常用命令汇总"><a href="#mysql基本常用命令汇总" class="headerlink" title="mysql基本常用命令汇总"></a>mysql基本常用命令汇总</h2><h3 id="常用总结"><a href="#常用总结" class="headerlink" title="常用总结"></a>常用总结</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs bash">creat database name; 创建数据库<br>use database_name; 选择数据库<br>drop database db_name; 直接删除数据库，不提醒<br>show tables; 显示表<br>describe table_name; 表的详细描述<br>select 中加上distinct去除重复字段<br><br>显示当前mysql版本和当前日期<br><br>select version(), current_date;<br><br>修改用户密码，如root<br><br>mysql&gt; update user <span class="hljs-built_in">set</span> authentication_string=password(<span class="hljs-string">&#x27;new_password&#x27;</span>) WHERE user=<span class="hljs-string">&#x27;root&#x27;</span>;<br>Query OK, <span class="hljs-comment">### row affected, ### warning (0.08 sec)</span><br>Rows matched: <span class="hljs-comment">###  Changed: ###  Warnings: 1</span><br><br>创建用户<br><br><br>CREATE USER <span class="hljs-string">&#x27;your_name&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> IDENTIFIED BY <span class="hljs-string">&#x27;password&#x27;</span>;<br><br>用户授权<br><br>GRANT ALL PRIVILEGES ON *.* TO <span class="hljs-string">&#x27;your_name&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> WITH GRANT OPTION<br><br>取消授权<br><br>mysql&gt; select user, host from mysql.user;  查看已经存在的用户<br>mysql&gt; revoke all privileges on *.* from <span class="hljs-built_in">test</span>@localhost; 取消授权<br>mysql&gt; delete from user <span class="hljs-built_in">where</span> user=<span class="hljs-string">&quot;test&quot;</span> and host=<span class="hljs-string">&quot;localhost&quot;</span>; 删除用户<br>mysql&gt; delete from user <span class="hljs-built_in">where</span> user=<span class="hljs-string">&quot;test&quot;</span> and host=<span class="hljs-string">&quot;localhost&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<h2 id="创建和操作表"><a href="#创建和操作表" class="headerlink" title="创建和操作表"></a>创建和操作表</h2><h3 id="创建表语法"><a href="#创建表语法" class="headerlink" title="创建表语法"></a>创建表语法</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">create table &lt;表名&gt;(<br>    &lt;列名<span class="hljs-comment">###  &lt;数据类型&gt; &lt;约束条件&gt;</span><br>    &lt;列名<span class="hljs-comment">###  &lt;数据类型&gt; &lt;约束条件&gt;</span><br>    &lt;列名<span class="hljs-comment">###  &lt;数据类型&gt; &lt;约束条件&gt;</span><br>    .....<br>);<br></code></pre></td></tr></table></figure>
+
+<h3 id="NULL值"><a href="#NULL值" class="headerlink" title="NULL值"></a>NULL值</h3><p>在定义表时，可以在约束条件中指定该列允许或不允许NULL值。如果指定不允许NULL值，则在插入数据时如果为NULL就会报错。</p>
+<h3 id="默认值"><a href="#默认值" class="headerlink" title="默认值"></a>默认值</h3><p>可以在定义表时使用默认值，使用关键词default &lt;值&gt;进行设定，如果在插入数据时，没有值插入，则该列会插入默认值。</p>
+<h3 id="更新表"><a href="#更新表" class="headerlink" title="更新表"></a>更新表</h3><p>更新表使用alter table语句，我们可以进行如下操作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">alter table &lt;表名&gt; add column &lt;列名&gt; &lt;数据类型&gt;;   //增加新列<br>alter table &lt;表名&gt; drop column &lt;列名&gt;;  //删除列<br></code></pre></td></tr></table></figure>
+
+<h3 id="重命名表"><a href="#重命名表" class="headerlink" title="重命名表"></a>重命名表</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">rename table &lt;旧表名&gt; to &lt;新表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="删除表"><a href="#删除表" class="headerlink" title="删除表"></a>删除表</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">drop table &lt;表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h2 id="检索数据"><a href="#检索数据" class="headerlink" title="检索数据"></a>检索数据</h2><h3 id="检索单列"><a href="#检索单列" class="headerlink" title="检索单列"></a>检索单列</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">select &lt;列名&gt; from &lt;表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="检索多列"><a href="#检索多列" class="headerlink" title="检索多列"></a>检索多列</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">select &lt;列名1&gt;, &lt;列名2&gt;, ... from &lt;表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="检索不同值"><a href="#检索不同值" class="headerlink" title="检索不同值"></a>检索不同值</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">select distinct(&lt;列名&gt;) from &lt;表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="限制结果"><a href="#限制结果" class="headerlink" title="限制结果"></a>限制结果</h3><p>在mysql中，如果我们需要限制结果输出的条数，可以使用limit &lt;数字&gt;来表示限制的行数。</p>
+<h3 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 注释     //单行注释</span><br>/* 多行注释<br>   多行注释<br>*/<br></code></pre></td></tr></table></figure>
+
+<h2 id="排序检索数据"><a href="#排序检索数据" class="headerlink" title="排序检索数据"></a>排序检索数据</h2><p>有时我们需要对检索出来的数据进行排序，这时我们使用如下语句进行:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">order by &lt;列名&gt; asc/desc;<br></code></pre></td></tr></table></figure>
+
+<p>asc为升序排序，也是mysql中默认的排序方式；desc表示按照降序排序。此外根据需要我们也可以对多列进行排序，如下代码所示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">order by &lt;列名1&gt; &lt;排序方法&gt;, &lt;列名2&gt; &lt;排序方法&gt;....;<br></code></pre></td></tr></table></figure>
+
+<p>值得注意的是，<strong>order by 语句通常位于查询语句的最后面</strong>。后面会具体介绍查询语句的完整构成。</p>
+<h2 id="过滤数据"><a href="#过滤数据" class="headerlink" title="过滤数据"></a>过滤数据</h2><h3 id="使用where子句"><a href="#使用where子句" class="headerlink" title="使用where子句"></a>使用where子句</h3><p>在sql中，我们使用where子名来对查询出的结果进行过滤，得到我们所需要的数据。它的格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">select &lt;列名&gt; from &lt;表名&gt;<br><span class="hljs-built_in">where</span> &lt;过滤条件&gt;;<br></code></pre></td></tr></table></figure>
+
+<p>过滤条件有多个时，我们可以使用and或or来进行多个条件的罗列。值得注意的是，当有多个过滤条件时，<strong>and的优先级会高于or</strong>，这也许会导致一些逻辑错误，需要注意。</p>
+<h3 id="where子句操作符"><a href="#where子句操作符" class="headerlink" title="where子句操作符"></a>where子句操作符</h3><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&#x3D;</td>
+<td>等于</td>
+</tr>
+<tr>
+<td>&lt;&gt;</td>
+<td>不等于。<strong>注释</strong>：在SQL的一些版本中，该操作符可以被写成!&#x3D;</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>|大于<br>&lt;|小于<br>&#x3D;|大于等于<br>&lt;&#x3D;|小于等于<br>BETWEEN|在某个范围内<br>LINK|搜索某种模式<br>IN|指定针对某个列的多个可能值</p>
+</blockquote>
+<p>值得注意的是，在判断某个值是否为空值时，应该使用is null或is not null来判断，而不是使用”&#x3D; null”或”!&#x3D; null”。</p>
+<h3 id="使用通配符进行过滤"><a href="#使用通配符进行过滤" class="headerlink" title="使用通配符进行过滤"></a>使用通配符进行过滤</h3><p>在使用通配符进行过滤进，我们使用like操作符进行。</p>
+<p>通配符主要包括两个，它们分别为百分号’%’和下划线’<em>‘，其中’%’表示使用长度的字符串，而下划线’</em>‘只表示一个字符；需要注意的是，’%’不仅可以表示一个或多个字符，还可以表示0个字符。</p>
+<h2 id="创建计算字段"><a href="#创建计算字段" class="headerlink" title="创建计算字段"></a>创建计算字段</h2><h3 id="计算字段"><a href="#计算字段" class="headerlink" title="计算字段"></a>计算字段</h3><p>存储在数据库中的数据一般不是应用程序所需要的格式。</p>
+<p>我们需要直接从数据库中检索出转化、计算或格式化过的数据；而不是检索出数据，然后再在客户机应用改程序或报告程序中重新格式化。</p>
+<p>只有数据库知道select语句中哪些列是实际的表列，哪些列是计算字段。从客户机（应用程序）的角度来看，计算字段的数据是以与其它列的数据相同的方式返回的。</p>
+<h3 id="拼接字段"><a href="#拼接字段" class="headerlink" title="拼接字段"></a>拼接字段</h3><p>在mysql中，我们可以使用concat函数对字段进行拼接，格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">concat(str1, str2, str3.....);<br></code></pre></td></tr></table></figure>
+
+<p>对于字符串中存在的空格，我们可以用字符串处理函数RTRIM()、LTRIM()、TRIM()来进行处理。</p>
+<h3 id="使用别名"><a href="#使用别名" class="headerlink" title="使用别名"></a>使用别名</h3><p>我们可以用关键字as来给我们的列起一个别名。格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">select &lt;列名&gt; as &lt;别名&gt; from &lt;表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h2 id="使用函数处理数据"><a href="#使用函数处理数据" class="headerlink" title="使用函数处理数据"></a>使用函数处理数据</h2><p>函数的可移植性是很可的，而且使用函数可以很方便的对数据进行处理。</p>
+<p>mysql函数主要有甲种</p>
+<ul>
+<li>文本函数</li>
+<li>数值函数</li>
+<li>时间与日期函数</li>
+<li>系统函数</li>
+</ul>
+<p>下面介绍常用的一些函数</p>
+<h3 id="文本函数"><a href="#文本函数" class="headerlink" title="文本函数"></a>文本函数</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">left(s, n)      //返回字符串左边的n个字符<br>right(s, n)     //返回字符串右边的n个字符<br>trim(s)         //去掉字符串s的空格<br>ltrim(s)        //去掉字符中左边的空格<br>rtrim(s)        //去掉字符串右边的空格<br>length(s)       //计算字符串的长度<br>lower(s)        //将字符串的所有字符变成小写<br>upper(s)        //将字符串的所有字符变成大写<br></code></pre></td></tr></table></figure>
+
+<h3 id="数值函数"><a href="#数值函数" class="headerlink" title="数值函数"></a>数值函数</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash">abs(x)      //绝对值<br>cos(x)<br>sin(x)<br>tan(x)<br>acos(x) asin(x) atan(x)     //三角函数<br>ceil(x)        //返回大于或等于X的最小整数<br>floor(x)       //舍去x的小数部分，只保留整数部分，并且不进行四舍五入<br>pi()           //返回圆周率<br>sqrt(x)        //平方根<br>pow(x,y)       //x的y次方<br>exp(x)         //返回e的x次方<br>rand()         //返回0－1的随机数<br>round(x,y)     //返回x的值小数点后面的第y位，进行四舍五入<br><span class="hljs-built_in">truncate</span>(x,y)  //返回x的值小数点后面的第y位，不进行四舍五入<br></code></pre></td></tr></table></figure>
+
+<h3 id="日期与时间函数"><a href="#日期与时间函数" class="headerlink" title="日期与时间函数"></a>日期与时间函数</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">current_date()      //返回当前日期<br>current_time()      //返回当前时间<br>current_timestap()/now()        //返回当前日期和时间<br><span class="hljs-built_in">date</span>()              //从日期或日期时间中撮日期值<br>year() month() day() hour() minute()<br>date_format(d, f)   //以指定格式显示日期<br>datediff()<br>timediff()<br>timestapdiff()<br></code></pre></td></tr></table></figure>
+
+<h3 id="汇总数据"><a href="#汇总数据" class="headerlink" title="汇总数据"></a>汇总数据</h3><p><strong>聚合函数</strong>：聚合函数就是用来数据汇总的一类函数。以下五个险函数务必牢记。它们通常和分级数据结合使用：</p>
+<ul>
+<li>avg()</li>
+<li>min()</li>
+<li>max()</li>
+<li>count()</li>
+<li>sum()</li>
+</ul>
+<p>需要注意的是，聚合函数均不会处理NULL值</p>
+<h2 id="分级数据"><a href="#分级数据" class="headerlink" title="分级数据"></a>分级数据</h2><h3 id="创建分组"><a href="#创建分组" class="headerlink" title="创建分组"></a>创建分组</h3><p>创建分组使用group by子句，格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">select &lt;列名&gt; from &lt;表名&gt;<br><span class="hljs-built_in">where</span> &lt;过滤条件&gt;<br>group by &lt;列名&gt;<br>having &lt;过滤条件&gt;<br>order by &lt;列名&gt; &lt;排序方式&gt;<br></code></pre></td></tr></table></figure>
+
+<p>其实上面的格式也是select语句完整格式。</p>
+<h3 id="过滤分组"><a href="#过滤分组" class="headerlink" title="过滤分组"></a>过滤分组</h3><p>过滤分组倩having，牢记<strong>where是行级过滤，having是组级过滤</strong></p>
+<h2 id="使用子查询"><a href="#使用子查询" class="headerlink" title="使用子查询"></a>使用子查询</h2><p>子查询也就是select语句的嵌套，有了子查询我们就可以进行复杂的查询。</p>
+<p>子查询返回的一张表，所以基位置也比较灵活，可以位于rom后面，也可以位于where后面。</p>
+<p>子查询也可以说是<strong>一个一次性的视图</strong>。</p>
+<p>在执行顺序上，先执行子查询，再执行外层的查询。</p>
+<p>牢记：<strong>where子句中不能使用聚合函数</strong></p>
+<h2 id="连接表"><a href="#连接表" class="headerlink" title="连接表"></a>连接表</h2><p>表的连接主要分为以下几种：</p>
+<ul>
+<li>内连接</li>
+<li>外连接（左连接、右连接）</li>
+<li>自连接</li>
+</ul>
+<h3 id="内连接"><a href="#内连接" class="headerlink" title="内连接"></a>内连接</h3><p>语法格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">SELECT 查询字段 FROM 表1 [as] 别名 [INNER] JOIN 表2 [as] 别名 ON 表1.关系字段 ＝ 表2.关系字段<br></code></pre></td></tr></table></figure>
+
+<p>内连接就是两个表的次部分。</p>
+<h3 id="左连接"><a href="#左连接" class="headerlink" title="左连接"></a>左连接</h3><p>语法格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">SELECT 查询字段 FROM 表1 [as] 别名 LEFT JOIN 表2 [as] 别名 ON 表1.关系字段 ＝ 表2.关系字段<br></code></pre></td></tr></table></figure>
+
+<p>左连接就是左边表的记录要全部显示出来，右右只有和械表匹配到的记录才进行显示。</p>
+<h3 id="右连接"><a href="#右连接" class="headerlink" title="右连接"></a>右连接</h3><p>和左连接相反。</p>
+<h3 id="自连接"><a href="#自连接" class="headerlink" title="自连接"></a>自连接</h3><p>就是表一张表看成两张表，进行自连接往往是一张表的某些列间存在逻辑关系。</p>
+<h2 id="组合查询"><a href="#组合查询" class="headerlink" title="组合查询"></a>组合查询</h2><h3 id="创建组合查询"><a href="#创建组合查询" class="headerlink" title="创建组合查询"></a>创建组合查询</h3><p>创建组合查询时我们使用UNION将两个或多个select语句查询的结果组合在一起形成一个表。</p>
+<p>需要不同的select语句返回相同数量的列且对应列的数据类型相同，事实上应该是意义都一样才合理。</p>
+<h3 id="union与union-all"><a href="#union与union-all" class="headerlink" title="union与union all"></a>union与union all</h3><p>对于组合查询结果的排序只需要使用一个order by子名句，放在最后一个select语句的后面即可。</p>
+<h2 id="插入、更新删除数据"><a href="#插入、更新删除数据" class="headerlink" title="插入、更新删除数据"></a>插入、更新删除数据</h2><h3 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">insert into &lt;表名&gt;(列名1，列名2，列名3...) values (数据...);<br></code></pre></td></tr></table></figure>
+
+<p>虽然表名后面的列名表不是严格要求的，但是这样会更安全。如果不写出列名，则需要严格按照表的定义插入数据。</p>
+<p>如果我们只需要插入一行中的部分列，那么列出列名就变得必须了。</p>
+<h4 id="插入检索出的数据"><a href="#插入检索出的数据" class="headerlink" title="插入检索出的数据"></a>插入检索出的数据</h4><p>使用insert …select 语句进行。以下是格式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">insert into &lt;表名&gt;(列名表)<br>select &lt;列名表&gt; from &lt;表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h4 id="复制表"><a href="#复制表" class="headerlink" title="复制表"></a>复制表</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">create table copytable as <br>select * from &lt;表名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h4 id="更新数据"><a href="#更新数据" class="headerlink" title="更新数据"></a>更新数据</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">update &lt;表名&gt;<br><span class="hljs-built_in">set</span> &lt;列名&gt; = ...<br><span class="hljs-built_in">where</span> &lt;过滤条件&gt;;<br></code></pre></td></tr></table></figure>
+
+<p>一定切记不要忘了过滤条件，否则将会对所有的行的数据进行更新。</p>
+<h4 id="删除数据"><a href="#删除数据" class="headerlink" title="删除数据"></a>删除数据</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">delect from &lt;表名&gt; <span class="hljs-built_in">where</span> &lt;过滤条件&gt;;<br></code></pre></td></tr></table></figure>
+
+<p>如果要删除某行中某列的元素，可以将其值更新为NULL。</p>
+<h2 id="使用视图"><a href="#使用视图" class="headerlink" title="使用视图"></a>使用视图</h2><p>视图是一张虚表，它并不在座实际的数据，存储的只是select语句。</p>
+<p>使用视力有如下的优点</p>
+<ul>
+<li>提高sql语句的重用性</li>
+<li>保证了数据的安全性</li>
+<li>大大简化了sql语句</li>
+</ul>
+<h3 id="创建视图"><a href="#创建视图" class="headerlink" title="创建视图"></a>创建视图</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">create view &lt;视图名&gt; as &lt;select 语句&gt;;<br></code></pre></td></tr></table></figure>
+
+<h3 id="删除视图"><a href="#删除视图" class="headerlink" title="删除视图"></a>删除视图</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">drop view &lt;视图名&gt;;<br></code></pre></td></tr></table></figure>
+
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><h3 id="什么是事务"><a href="#什么是事务" class="headerlink" title="什么是事务"></a>什么是事务</h3><p>需要在同一个处理单元中执行的一系列更新处理的集合。一个事务中包含了多少个更新处理或者包含了哪些处理，在DBMS中没有固定的标准，而是根据用户的要求决定的。</p>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">start tyransaction;<br>DML 语句1；<br>DML 语句2；<br>DML 语句3；<br>...<br>ROLLBACK／COMMIT；<br></code></pre></td></tr></table></figure>
+
+<h3 id="理解事务"><a href="#理解事务" class="headerlink" title="理解事务"></a>理解事务</h3><p>事务其实很好理解，它将一系列操作放在一个块中形成一个代码块，这个代码块要执行就全部执行，要么就不执行。</p>
+<p>拿银行转账为例，转账过程为，我的账户金额减少－－》对方账户金额增加－－》交易完毕。</p>
+<p>如果我的账户金额减少后出现了故障导致对方账户金额没有增加，那么这肯定是不被允许的。所以这个转账过程中的每一步都必须完整的执行。</p>
+<p>ROLLBACK就是在DML语句出现故障时，来便利数据库回滚到执行操作前的状态。而COMMIT则是所有DML正确执行后才执行，告诉系统这个事务正常完成了，系统可以进入下一个新的状态了。</p>
+<h2 id="补充知识点"><a href="#补充知识点" class="headerlink" title="补充知识点"></a>补充知识点</h2><h3 id="case-when-语句"><a href="#case-when-语句" class="headerlink" title="case when 语句"></a>case when 语句</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-keyword">case</span> when &lt;表达式1&gt; <span class="hljs-keyword">then</span> &lt;表达式&gt;<br>     when &lt;表达式2&gt; them &lt;表达式&gt;<br>     ...<br>     <span class="hljs-keyword">else</span> &lt;表达式&gt;<br>end<br></code></pre></td></tr></table></figure>
+
+<h3 id="sql语句及种类"><a href="#sql语句及种类" class="headerlink" title="sql语句及种类"></a>sql语句及种类</h3><p>这是sql的基础知识：</p>
+<p>－ DDL：数据定义语言，用来创建、删除存储数据的数据训以及数据库中的表的对象，包含的指令有：CREATE、DROOP、ALTER<br>－ DML：数据操纵语言，用来查询或者变更表中的记录。包含的指令有：SELECT、INSERT、UPDATE、DELETE<br>－ DCL：数据控制语言，用来确认或者取消对数据库中的数据进行的变量。包含的指令有：COMMIT、ROLLBACK、GRANT、REVOKE</p>
+<h3 id="exists谓词"><a href="#exists谓词" class="headerlink" title="exists谓词"></a>exists谓词</h3><p>在sql语言中，exists(存在)谓词是一个非常重要的查询关键词。</p>
+<p>exists代表<strong>存在</strong>量词。带有exists谓词的子查询不返回任何数据，只产生逻辑真值“true”或逻辑假值“flase”。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/database/" class="category-chain-item">database</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/mysql/">#mysql</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>mysql 常用操作</div>
+      <div>https://ywmy.xyz/2021/11/25/mysql-常用操作/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>ian</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年11月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-nc"></i>
+                  </span>
+                </a>
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/04/22/ubuntu%E5%AE%89%E8%A3%85nodejs/" title="ubuntu安装nodejs">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ubuntu安装nodejs</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/11/16/zabbix-%E5%88%87%E6%8D%A2%E5%9B%BD%E5%86%85%E6%BA%90/" title="zabbix 切换国内源">
+                        <span class="hidden-mobile">zabbix 切换国内源</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      浙ICP备18045748号-1
+    </a>
+  </span>
+  
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  
+<script src="/js/canvas-ribbon.js"></script>
+<script src="/js/Cherry.min.js"></script>
+<script src="/js/DynamicLine.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"live2d-widget-model-shizuku"},"display":{"superSample":2,"position":"left","width":150,"height":300,"hOffset":75,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacity":0.7},"name":{"canvas":"live2dcanvas","div":"live2d-widget"},"dev":{"border":false},"dialog":{"enable":true,"hitokoto":true}});</script></body>
+</html>
