@@ -286,7 +286,7 @@
                 
                 <h1 id="centos-7-安装-openldap"><a href="#centos-7-安装-openldap" class="headerlink" title="centos 7 安装 openldap"></a>centos 7 安装 openldap</h1><p>openldap 相关名称解释及CentOS 7 配置openldap过程。</p>
 <span id="more"></span>
-<h2 id="ldap的信息模型"><a href="#ldap的信息模型" class="headerlink" title="ldap的信息模型"></a>ldap的信息模型</h2><p>LDAP的信息模型是建立在”条目”（entries）的基础上。一个条目是一些属性的集合，并且具有一个全局唯一的”可区分名称”DN，一个条目可以通过DN来引用。每一个条目的属性具有一个类型和一个或者多个值。类型通常是容易记忆的名称，比如”cn”是通用名称（common name） ，或者”mail”是电子邮件地址。条目的值的语法取决于属性类型。比如，cn属性可能具有一个值”Babs Jensen” 。一个mail属性可能包含”<a href="mailto:&#66;&#x61;&#x62;&#x73;&#x40;&#97;&#98;&#x63;&#46;&#x63;&#x6f;&#109;">&#66;&#x61;&#x62;&#x73;&#x40;&#97;&#98;&#x63;&#46;&#x63;&#x6f;&#109;</a>“ 。一个jpegphoto属性可能包含一幅JPEG（二进制）格式的图片。</p>
+<h2 id="ldap的信息模型"><a href="#ldap的信息模型" class="headerlink" title="ldap的信息模型"></a>ldap的信息模型</h2><p>LDAP的信息模型是建立在”条目”（entries）的基础上。一个条目是一些属性的集合，并且具有一个全局唯一的”可区分名称”DN，一个条目可以通过DN来引用。每一个条目的属性具有一个类型和一个或者多个值。类型通常是容易记忆的名称，比如”cn”是通用名称（common name） ，或者”mail”是电子邮件地址。条目的值的语法取决于属性类型。比如，cn属性可能具有一个值”Babs Jensen” 。一个mail属性可能包含”<a href="mailto:&#x42;&#97;&#x62;&#x73;&#x40;&#x61;&#x62;&#x63;&#x2e;&#x63;&#111;&#109;">&#x42;&#97;&#x62;&#x73;&#x40;&#x61;&#x62;&#x63;&#x2e;&#x63;&#111;&#109;</a>“ 。一个jpegphoto属性可能包含一幅JPEG（二进制）格式的图片。</p>
 <h2 id="ldap的objectClass"><a href="#ldap的objectClass" class="headerlink" title="ldap的objectClass"></a>ldap的objectClass</h2><p>LDAP通过属性objectClass来控制哪一个属性必须出现或允许出现在一个条目中，它的值决定了该条目必须遵守的模式规则,可以理解为关系数据库的表结构。</p>
 <table>
 <thead>
